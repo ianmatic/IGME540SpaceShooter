@@ -325,7 +325,9 @@ void Game::CreateBasicGeometry()
 	player = new Entity(cubeMesh, fabricMaterial);
 	enemy = new Entity(torusMesh, rustMaterial);
 	playerL = new Entity(sphereMesh, fabricMaterial);
+	playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 	enemyL = new Entity(sphereMesh, rustMaterial);
+	enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 
 	player->SetPosition(XMFLOAT3(0, 0, 5));
 }
@@ -382,10 +384,10 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 	else if (GetAsyncKeyState('S') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + 0.1f));
-		if (player->GetPosition().z >= 10)
+		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.1f));
+		if (player->GetPosition().z <= -10)
 		{
-			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 10));
+			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -10));
 		}
 	}
 
@@ -397,10 +399,10 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 	else if (GetAsyncKeyState('W') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.1f));
-		if (player->GetPosition().z <= -10)
+		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + 0.1f));
+		if (player->GetPosition().z >= 10)
 		{
-			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -10));
+			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 10));
 		}
 	}
 
@@ -412,8 +414,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 	for (int i = 0; i < lasers.size(); i++)
 	{
-		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z - 0.1f));
-		if (lasers[i]->GetPosition().z <= -50.0f && i < lasers.size())
+		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + 0.1f));
+		if (lasers[i]->GetPosition().z >= 50.0f && i < lasers.size())
 		{
 
 			// reduce size of array and move all 
@@ -453,8 +455,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 	for (int i = 0; i < enemyLasers.size(); i++)
 	{
-		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z + 0.1f));
-		if (enemyLasers[i]->GetPosition().z >= 50.0f && i < enemyLasers.size())
+		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - 0.1f));
+		if (enemyLasers[i]->GetPosition().z <= -50.0f && i < enemyLasers.size())
 		{
 
 			// reduce size of array and move all 
@@ -537,116 +539,6 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 		context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
-
-		player->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-		player->GetMaterial()->GetVertexShader()->CopyAllBufferData();
-
-
-		// Set the vertex and pixel shaders to use for the next Draw() command
-		//  - These don't technically need to be set every frame...YET
-		//  - Once you start applying different shaders to different objects,
-		//    you'll need to swap the current shaders before each draw
-		player->GetMaterial()->GetVertexShader()->SetShader();
-
-		// Send data to pixel shader
-		player->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-			&light, sizeof(DirectionalLight));
-		player->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-			&redDirLight, sizeof(DirectionalLight));
-		player->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-			&greenPointLight, sizeof(PointLight));
-		player->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-			&whitePointLight, sizeof(PointLight));
-		player->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-			camera->GetPosition());
-
-		player->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-		player->GetMaterial()->GetPixelShader()->SetShader();
-
-		for (int i = 0; i < lasers.size(); i++)
-		{
-			lasers[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-			lasers[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
-
-
-			// Set the vertex and pixel shaders to use for the next Draw() command
-			//  - These don't technically need to be set every frame...YET
-			//  - Once you start applying different shaders to different objects,
-			//    you'll need to swap the current shaders before each draw
-			lasers[i]->GetMaterial()->GetVertexShader()->SetShader();
-
-			// Send data to pixel shader
-			lasers[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-				&light, sizeof(DirectionalLight));
-			lasers[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-				&redDirLight, sizeof(DirectionalLight));
-			lasers[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-				&greenPointLight, sizeof(PointLight));
-			lasers[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-				&whitePointLight, sizeof(PointLight));
-			lasers[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-				camera->GetPosition());
-
-			lasers[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-			lasers[i]->GetMaterial()->GetPixelShader()->SetShader();
-		}
-
-		for (int i = 0; i < enemyLasers.size(); i++)
-		{
-			enemyLasers[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-			enemyLasers[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
-
-
-			// Set the vertex and pixel shaders to use for the next Draw() command
-			//  - These don't technically need to be set every frame...YET
-			//  - Once you start applying different shaders to different objects,
-			//    you'll need to swap the current shaders before each draw
-			enemyLasers[i]->GetMaterial()->GetVertexShader()->SetShader();
-
-			// Send data to pixel shader
-			enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-				&light, sizeof(DirectionalLight));
-			enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-				&redDirLight, sizeof(DirectionalLight));
-			enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-				&greenPointLight, sizeof(PointLight));
-			enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-				&whitePointLight, sizeof(PointLight));
-			enemyLasers[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-				camera->GetPosition());
-
-			enemyLasers[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-			enemyLasers[i]->GetMaterial()->GetPixelShader()->SetShader();
-		}
-
-		for (int i = 0; i < enemies.size(); i++)
-		{
-			enemies[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-			enemies[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
-
-
-			// Set the vertex and pixel shaders to use for the next Draw() command
-			//  - These don't technically need to be set every frame...YET
-			//  - Once you start applying different shaders to different objects,
-			//    you'll need to swap the current shaders before each draw
-			enemies[i]->GetMaterial()->GetVertexShader()->SetShader();
-
-			// Send data to pixel shader
-			enemies[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-				&light, sizeof(DirectionalLight));
-			enemies[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-				&redDirLight, sizeof(DirectionalLight));
-			enemies[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-				&greenPointLight, sizeof(PointLight));
-			enemies[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-				&whitePointLight, sizeof(PointLight));
-			enemies[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-				camera->GetPosition());
-
-			enemies[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-			enemies[i]->GetMaterial()->GetPixelShader()->SetShader();
-		}
-
 		// Finally do the actual drawing
 		//  - Do this ONCE PER OBJECT you intend to draw
 		//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
@@ -655,6 +547,144 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->DrawIndexed(3, 0, 0);
 
 	}
+
+	player->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+	player->GetMaterial()->GetVertexShader()->CopyAllBufferData();
+
+
+	// Set the vertex and pixel shaders to use for the next Draw() command
+	//  - These don't technically need to be set every frame...YET
+	//  - Once you start applying different shaders to different objects,
+	//    you'll need to swap the current shaders before each draw
+	player->GetMaterial()->GetVertexShader()->SetShader();
+
+	// Send data to pixel shader
+	player->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
+		&light, sizeof(DirectionalLight));
+	player->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
+		&redDirLight, sizeof(DirectionalLight));
+	player->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
+		&greenPointLight, sizeof(PointLight));
+	player->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
+		&whitePointLight, sizeof(PointLight));
+	player->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
+		camera->GetPosition());
+
+	player->GetMaterial()->GetPixelShader()->CopyAllBufferData();
+	player->GetMaterial()->GetPixelShader()->SetShader();
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
+	ID3D11Buffer* vertexBuffer = player->GetMesh()->GetVertexBuffer();
+	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+	context->IASetIndexBuffer(player->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+	context->DrawIndexed(player->GetMesh()->GetIndexCount(), 0, 0);
+	context->DrawIndexed(3, 0, 0);
+
+	for (int i = 0; i < lasers.size(); i++)
+	{
+		lasers[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+		lasers[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
+
+
+		// Set the vertex and pixel shaders to use for the next Draw() command
+		//  - These don't technically need to be set every frame...YET
+		//  - Once you start applying different shaders to different objects,
+		//    you'll need to swap the current shaders before each draw
+		lasers[i]->GetMaterial()->GetVertexShader()->SetShader();
+
+		// Send data to pixel shader
+		lasers[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
+			&light, sizeof(DirectionalLight));
+		lasers[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
+			&redDirLight, sizeof(DirectionalLight));
+		lasers[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
+			&greenPointLight, sizeof(PointLight));
+		lasers[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
+			&whitePointLight, sizeof(PointLight));
+		lasers[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
+			camera->GetPosition());
+
+		lasers[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
+		lasers[i]->GetMaterial()->GetPixelShader()->SetShader();
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		ID3D11Buffer* vertexBuffer = lasers[i]->GetMesh()->GetVertexBuffer();
+		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		context->IASetIndexBuffer(lasers[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+		context->DrawIndexed(lasers[i]->GetMesh()->GetIndexCount(), 0, 0);
+		context->DrawIndexed(3, 0, 0);
+	}
+
+	for (int i = 0; i < enemyLasers.size(); i++)
+	{
+		enemyLasers[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+		enemyLasers[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
+
+
+		// Set the vertex and pixel shaders to use for the next Draw() command
+		//  - These don't technically need to be set every frame...YET
+		//  - Once you start applying different shaders to different objects,
+		//    you'll need to swap the current shaders before each draw
+		enemyLasers[i]->GetMaterial()->GetVertexShader()->SetShader();
+
+		// Send data to pixel shader
+		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
+			&light, sizeof(DirectionalLight));
+		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
+			&redDirLight, sizeof(DirectionalLight));
+		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
+			&greenPointLight, sizeof(PointLight));
+		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
+			&whitePointLight, sizeof(PointLight));
+		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
+			camera->GetPosition());
+
+		enemyLasers[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
+		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetShader();
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		ID3D11Buffer* vertexBuffer = enemyLasers[i]->GetMesh()->GetVertexBuffer();
+		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		context->IASetIndexBuffer(enemyLasers[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+		context->DrawIndexed(enemyLasers [i]->GetMesh()->GetIndexCount(), 0, 0);
+		context->DrawIndexed(3, 0, 0);
+	}
+
+	for (int i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
+		enemies[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
+
+
+		// Set the vertex and pixel shaders to use for the next Draw() command
+		//  - These don't technically need to be set every frame...YET
+		//  - Once you start applying different shaders to different objects,
+		//    you'll need to swap the current shaders before each draw
+		enemies[i]->GetMaterial()->GetVertexShader()->SetShader();
+
+		// Send data to pixel shader
+		enemies[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
+			&light, sizeof(DirectionalLight));
+		enemies[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
+			&redDirLight, sizeof(DirectionalLight));
+		enemies[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
+			&greenPointLight, sizeof(PointLight));
+		enemies[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
+			&whitePointLight, sizeof(PointLight));
+		enemies[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
+			camera->GetPosition());
+
+		enemies[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
+		enemies[i]->GetMaterial()->GetPixelShader()->SetShader();
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		ID3D11Buffer* vertexBuffer = enemies[i]->GetMesh()->GetVertexBuffer();
+		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		context->IASetIndexBuffer(enemies[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+		context->DrawIndexed(enemies[i]->GetMesh()->GetIndexCount(), 0, 0);
+		context->DrawIndexed(3, 0, 0);
+	}
+
 
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
