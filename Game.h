@@ -61,7 +61,17 @@ private:
 	Mesh* torusMesh;
 	Mesh* cubeMesh;
 
+	Entity* player;
+	Entity* enemy;
+	Entity* playerL;
+	Entity* enemyL;
+
 	std::vector<Entity*> entities;
+	std::vector<Entity*> enemies;
+	std::vector<Entity*> lasers;
+	std::vector<Entity*> enemyLasers;
+
+	float timer = 5.0f;
 
 	Camera* camera;
 
