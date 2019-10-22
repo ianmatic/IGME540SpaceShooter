@@ -71,7 +71,7 @@ private:
 	std::vector<Entity*> lasers;
 	std::vector<Entity*> enemyLasers;
 
-	float timer = 5.0f;
+	float timer = 1000.0f;
 
 	Camera* camera;
 

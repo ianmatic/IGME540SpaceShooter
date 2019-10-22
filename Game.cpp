@@ -323,13 +323,8 @@ void Game::CreateBasicGeometry()
 	entities.push_back(new Entity(cubeMesh, rustMaterial));
 
 	player = new Entity(cubeMesh, fabricMaterial);
-	enemy = new Entity(torusMesh, rustMaterial);
-	playerL = new Entity(sphereMesh, fabricMaterial);
-	playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
-	enemyL = new Entity(sphereMesh, rustMaterial);
-	enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 
-	player->SetPosition(XMFLOAT3(0, 0, 5));
+	player->SetPosition(XMFLOAT3(0, 0, -1));
 }
 
 
@@ -406,9 +401,12 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 
-	playerL->SetPosition(player->GetPosition());
+	
 
-	if (GetAsyncKeyState('P') & 0x8000) {
+	if (GetAsyncKeyState('P') & 0x1) {
+		playerL = new Entity(sphereMesh, fabricMaterial);
+		playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+		playerL->SetPosition(player->GetPosition());
 		lasers.push_back(playerL);
 	}
 
@@ -417,7 +415,7 @@ void Game::Update(float deltaTime, float totalTime)
 		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + 0.1f));
 		if (lasers[i]->GetPosition().z >= 50.0f && i < lasers.size())
 		{
-
+			delete lasers[i];
 			// reduce size of array and move all 
 			// elements on space ahead 
 			int n = lasers.size() - 1;
@@ -429,10 +427,15 @@ void Game::Update(float deltaTime, float totalTime)
 	timer -= 0.1f;
 	if (timer <= 0)
 	{
-		timer = 10.0f;
+		enemy = new Entity(torusMesh, rustMaterial);
+
+		timer = 1000.0f;
 		enemies.push_back(enemy);
 		for (int i = 0; i < enemies.size(); i++)
 		{
+
+			enemyL = new Entity(sphereMesh, rustMaterial);
+			enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 			enemyL->SetPosition(enemies[i]->GetPosition());
 			enemyLasers.push_back(enemyL);
 		}
@@ -447,6 +450,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 			// reduce size of array and move all 
 			// elements on space ahead 
+			delete enemies[i];
 			int n = enemies.size() - 1;
 			for (int j = i; j < n; j++)
 				enemies[j] = enemies[j + 1];
@@ -460,7 +464,8 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 
 			// reduce size of array and move all 
-			// elements on space ahead 
+			// elements on space ahead
+			delete enemyLasers[i];
 			int n = enemyLasers.size() - 1;
 			for (int j = i; j < n; j++)
 				enemyLasers[j] = enemyLasers[j + 1];
