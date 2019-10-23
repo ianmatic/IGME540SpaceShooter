@@ -415,12 +415,14 @@ void Game::Update(float deltaTime, float totalTime)
 		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + 0.1f));
 		if (lasers[i]->GetPosition().z >= 50.0f && i < lasers.size())
 		{
-			delete lasers[i];
+			Entity* e = lasers[i];
 			// reduce size of array and move all 
 			// elements on space ahead 
 			int n = lasers.size() - 1;
 			for (int j = i; j < n; j++)
 				lasers[j] = lasers[j + 1];
+
+			delete e;
 		}
 	}
 
@@ -450,10 +452,13 @@ void Game::Update(float deltaTime, float totalTime)
 
 			// reduce size of array and move all 
 			// elements on space ahead 
-			delete enemies[i];
+			Entity* e = enemies[i];
+			
 			int n = enemies.size() - 1;
 			for (int j = i; j < n; j++)
 				enemies[j] = enemies[j + 1];
+
+			delete e;
 		}
 	}
 
@@ -465,10 +470,12 @@ void Game::Update(float deltaTime, float totalTime)
 
 			// reduce size of array and move all 
 			// elements on space ahead
-			delete enemyLasers[i];
+			Entity* e = enemyLasers[i];
 			int n = enemyLasers.size() - 1;
 			for (int j = i; j < n; j++)
 				enemyLasers[j] = enemyLasers[j + 1];
+
+			delete e;
 		}
 	}
 

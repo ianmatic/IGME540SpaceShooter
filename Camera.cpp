@@ -98,7 +98,7 @@ void Camera::HandleInput(float deltaTime, DirectX::XMFLOAT4 rotationQuat)
 
 	// Relative Movement
 	// Use scale for vector and scalar multiplication
-	if (GetAsyncKeyState('W') && 0x8000) {
+	/*if (GetAsyncKeyState('W') && 0x8000) {
 		tempCameraPos = DirectX::XMVectorAdd(tempCameraPos, 
 			DirectX::XMVector3Rotate(DirectX::XMVectorSet(0, 0, speed, 0), tempRotationQuat));
 		dirty = true;
@@ -117,7 +117,7 @@ void Camera::HandleInput(float deltaTime, DirectX::XMFLOAT4 rotationQuat)
 		tempCameraPos = DirectX::XMVectorAdd(tempCameraPos, 
 			DirectX::XMVector3Rotate(DirectX::XMVectorSet(speed, 0, 0, 0), tempRotationQuat));
 		dirty = true;
-	}
+	}*/
 
 	// Apply relative movement
 	if (dirty) {
