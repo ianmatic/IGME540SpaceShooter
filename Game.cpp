@@ -372,14 +372,14 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 
 	if (GetAsyncKeyState('A') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x - 0.1f, player->GetPosition().y, player->GetPosition().z));
+		player->SetPosition(XMFLOAT3(player->GetPosition().x - 0.01f, player->GetPosition().y, player->GetPosition().z));
 		if (player->GetPosition().x <= -10)
 		{
 			player->SetPosition(XMFLOAT3(-10, 0, player->GetPosition().z));
 		}
 	}
 	else if (GetAsyncKeyState('S') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.1f));
+		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.01f));
 		if (player->GetPosition().z <= -10)
 		{
 			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -10));
@@ -387,14 +387,14 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 
 	else if (GetAsyncKeyState('D') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x + 0.1f, player->GetPosition().y, player->GetPosition().z));
+		player->SetPosition(XMFLOAT3(player->GetPosition().x + 0.01f, player->GetPosition().y, player->GetPosition().z));
 		if (player->GetPosition().x >= 10)
 		{
 			player->SetPosition(XMFLOAT3(10, 0, player->GetPosition().z));
 		}
 	}
 	else if (GetAsyncKeyState('W') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + 0.1f));
+		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + 0.01f));
 		if (player->GetPosition().z >= 10)
 		{
 			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 10));
@@ -415,14 +415,7 @@ void Game::Update(float deltaTime, float totalTime)
 		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + 0.1f));
 		if (lasers[i]->GetPosition().z >= 50.0f && i < lasers.size())
 		{
-			Entity* e = lasers[i];
-			// reduce size of array and move all 
-			// elements on space ahead 
-			int n = lasers.size() - 1;
-			for (int j = i; j < n; j++)
-				lasers[j] = lasers[j + 1];
-
-			delete e;
+			lasers.erase(lasers.begin() + i);
 		}
 	}
 
@@ -446,19 +439,11 @@ void Game::Update(float deltaTime, float totalTime)
 
 	for (int i = 0; i < enemies.size(); i++)
 	{
-		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + 0.1f, enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
+		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + 0.01f, enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
 		if (enemies[i]->GetPosition().x >= 50.0f && i < enemies.size())
 		{
 
-			// reduce size of array and move all 
-			// elements on space ahead 
-			Entity* e = enemies[i];
-			
-			int n = enemies.size() - 1;
-			for (int j = i; j < n; j++)
-				enemies[j] = enemies[j + 1];
-
-			delete e;
+			enemies.erase(enemies.begin() + i);
 		}
 	}
 
@@ -468,14 +453,7 @@ void Game::Update(float deltaTime, float totalTime)
 		if (enemyLasers[i]->GetPosition().z <= -50.0f && i < enemyLasers.size())
 		{
 
-			// reduce size of array and move all 
-			// elements on space ahead
-			Entity* e = enemyLasers[i];
-			int n = enemyLasers.size() - 1;
-			for (int j = i; j < n; j++)
-				enemyLasers[j] = enemyLasers[j + 1];
-
-			delete e;
+			enemyLasers.erase(enemyLasers.begin() + i);
 		}
 	}
 
