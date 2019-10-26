@@ -182,9 +182,9 @@ void Game::LoadShaders()
 	pixelShaderSpecularMap->LoadShaderFile(L"PixelShaderSpecularMap.cso");
 
 	// Load the texture
-	CreateWICTextureFromFile(device, 
-		context, 
-		L"../../assets/textures/giraffe.jpg", 
+	CreateWICTextureFromFile(device,
+		context,
+		L"../../assets/textures/giraffe.jpg",
 		0,	// don't need reference to texture
 		&giraffeTextureSRV
 	);
@@ -305,7 +305,7 @@ void Game::CreateBasicGeometry()
 		{ XMFLOAT3(-2.0f, +0.0f, +0.0f), XMFLOAT2(0,0), XMFLOAT3(0,0,-1), XMFLOAT3(0,0,0) },
 		{ XMFLOAT3(+0.0f, +0.0f, +0.0f), XMFLOAT2(0,0), XMFLOAT3(0,0,-1), XMFLOAT3(0,0,0) },
 		{ XMFLOAT3(+0.0f, -2.0f, +0.0f), XMFLOAT2(0,0), XMFLOAT3(0,0,-1), XMFLOAT3(0,0,0) },
-	};	
+	};
 
 	unsigned int blueIndices[] = { 0, 1, 2, 0, 2, 3 };
 
@@ -317,10 +317,9 @@ void Game::CreateBasicGeometry()
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
 	cubeMesh = new Mesh("../../assets/models/cube.obj", device);
 
-	entities.push_back(new Entity(sphereMesh, fabricMaterial));
-	entities.push_back(new Entity(coneMesh, giraffeMaterial));
-	entities.push_back(new Entity(torusMesh, rockMaterial));
-	entities.push_back(new Entity(cubeMesh, rustMaterial));
+	player = new Entity(cubeMesh, fabricMaterial);
+
+	player->SetPosition(XMFLOAT3(0, 0, -1));
 }
 
 
@@ -341,29 +340,94 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	entities.clear();
 	camera->Update(deltaTime);
-
-	for (int i = 0; i < entities.size(); i++) {
-
-		//do various transformations on entities
-		switch (i)
+	float playerSpeed = 2.0f;
+	if (GetAsyncKeyState('A') & 0x8000) {
+		player->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+		if (player->GetPosition().x <= -8)
 		{
-		case 0:
-			//entities[i]->Translate(XMVectorSet(cos(totalTime) / 2, 0, 0, 0) * deltaTime * 2);
-			break;
-		case 1:
-			entities[i]->SetPosition(XMFLOAT3(-2.5, 1.5, 0));
-			entities[i]->Rotate(XMVectorSet(0, 0, 1, 0) * deltaTime);
-			break;
-		case 2:
-			entities[i]->Rotate(XMVectorSet(1, 0, 0, 0) * deltaTime);
-			entities[i]->SetPosition(XMFLOAT3(3, 0, 0));
-			break;
-		case 3:
-			entities[i]->SetPosition(XMFLOAT3(0, 0, -2));
-			entities[i]->Rotate(XMVectorSet(0, 0.5f, 0, 0) * deltaTime);
-		default:
-			break;
+			player->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
+		}
+	}
+	else if (GetAsyncKeyState('D') & 0x8000) {
+		player->SetPosition(XMFLOAT3(player->GetPosition().x + (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+		if (player->GetPosition().x >= 8)
+		{
+			player->SetPosition(XMFLOAT3(8, 0, player->GetPosition().z));
+		}
+	}
+
+
+	if (GetAsyncKeyState('W') & 0x8000) {
+		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + (playerSpeed * deltaTime)));
+		if (player->GetPosition().z >= 8)
+		{
+			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 8));
+		}
+	}
+	else if (GetAsyncKeyState('S') & 0x8000) {
+		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - (playerSpeed * deltaTime)));
+		if (player->GetPosition().z <= -2)
+		{
+			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -2));
+		}
+	}
+
+	if (GetAsyncKeyState('P') & 0x1) {
+		playerL = new Entity(sphereMesh, fabricMaterial);
+		playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+		playerL->SetPosition(player->GetPosition());
+		lasers.push_back(playerL);
+	}
+
+	float laserSpeed = 7.5f;
+	for (int i = 0; i < lasers.size(); i++)
+	{
+
+		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
+		if (lasers[i]->GetPosition().z >= 50.0f && i < lasers.size())
+		{
+			delete lasers[i];
+			lasers.erase(lasers.begin() + i);
+		}
+	}
+
+	timer -= deltaTime;
+	if (timer <= 0)
+	{
+		enemy = new Entity(torusMesh, rustMaterial);
+
+		timer = 10.0f;
+		enemies.push_back(enemy);
+		for (int i = 0; i < enemies.size(); i++)
+		{
+			enemyL = new Entity(sphereMesh, rustMaterial);
+			enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+			enemyL->SetPosition(enemies[i]->GetPosition());
+			enemyLasers.push_back(enemyL);
+		}
+
+	}
+
+	float enemySpeed = 2.0f;
+	for (int i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
+		if (enemies[i]->GetPosition().x >= 50.0f && i < enemies.size())
+		{
+			delete enemies[i];
+			enemies.erase(enemies.begin() + i);
+		}
+	}
+
+	for (int i = 0; i < enemyLasers.size(); i++)
+	{
+		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
+		if (enemyLasers[i]->GetPosition().z <= -50.0f && i < enemyLasers.size())
+		{
+			delete enemyLasers[i];
+			enemyLasers.erase(enemyLasers.begin() + i);
 		}
 	}
 
@@ -373,6 +437,12 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	//if (GetAsyncKeyState(VK_ESCAPE))
 	//	Quit();
+
+	// add all entities to entities for drawing
+	entities.push_back(player);
+	entities.insert(entities.end(), enemies.begin(), enemies.end());
+	entities.insert(entities.end(), lasers.begin(), lasers.end());
+	entities.insert(entities.end(), enemyLasers.begin(), enemyLasers.end());
 }
 
 // --------------------------------------------------------
@@ -439,7 +509,6 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 		context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 		context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
-
 		// Finally do the actual drawing
 		//  - Do this ONCE PER OBJECT you intend to draw
 		//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
@@ -448,7 +517,6 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->DrawIndexed(3, 0, 0);
 
 	}
-
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
@@ -501,11 +569,12 @@ void Game::OnMouseUp(WPARAM buttonState, int x, int y)
 void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 {
 	// right mouse down
-	if (buttonState & 0x0002) {
-		float xDiff = (float)prevMousePos.x - x;
-		float yDiff = (float)prevMousePos.y - y;
-		camera->Rotate(xDiff / 500, yDiff / 500);
-	}
+	// uncomment for camera angle testing
+	//if (buttonState & 0x0002) {
+	//	float xDiff = (float)prevMousePos.x - x;
+	//	float yDiff = (float)prevMousePos.y - y;
+	//	camera->Rotate(xDiff / 500, yDiff / 500);
+	//}
 
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
