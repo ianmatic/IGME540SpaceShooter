@@ -28,9 +28,9 @@ DirectX::XMFLOAT3 Camera::GetPosition()
 Camera::Camera()
 {
 	rotationQuat = DirectX::XMFLOAT4(0, 0, 0, 0);
-	cameraPos = DirectX::XMFLOAT3(0, 0, -5);
+	cameraPos = DirectX::XMFLOAT3(0, 10, -10);
 	cameraDir = DirectX::XMFLOAT3(0, 0, 1);
-	xRot = 0;
+	xRot = DirectX::XM_PI / 5.5f;
 	yRot = 0;
 }
 
@@ -50,9 +50,6 @@ void Camera::Update(float deltaTime)
 		DirectX::XMVectorAdd(
 			DirectX::XMLoadFloat3(&cameraPos),
 			DirectX::XMVector3Rotate(DirectX::XMVectorSet(0, 0, 1, 0), DirectX::XMLoadFloat4(&rotationQuat))));
-
-	// handle keyboard input
-	HandleInput(deltaTime, rotationQuat);
 
 	// calculate view matrix and store it
 	DirectX::XMStoreFloat4x4(&viewMat,
@@ -98,7 +95,7 @@ void Camera::HandleInput(float deltaTime, DirectX::XMFLOAT4 rotationQuat)
 
 	// Relative Movement
 	// Use scale for vector and scalar multiplication
-	/*if (GetAsyncKeyState('W') && 0x8000) {
+	if (GetAsyncKeyState('W') && 0x8000) {
 		tempCameraPos = DirectX::XMVectorAdd(tempCameraPos, 
 			DirectX::XMVector3Rotate(DirectX::XMVectorSet(0, 0, speed, 0), tempRotationQuat));
 		dirty = true;
@@ -117,7 +114,7 @@ void Camera::HandleInput(float deltaTime, DirectX::XMFLOAT4 rotationQuat)
 		tempCameraPos = DirectX::XMVectorAdd(tempCameraPos, 
 			DirectX::XMVector3Rotate(DirectX::XMVectorSet(speed, 0, 0, 0), tempRotationQuat));
 		dirty = true;
-	}*/
+	}
 
 	// Apply relative movement
 	if (dirty) {

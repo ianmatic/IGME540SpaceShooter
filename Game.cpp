@@ -317,11 +317,6 @@ void Game::CreateBasicGeometry()
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
 	cubeMesh = new Mesh("../../assets/models/cube.obj", device);
 
-	entities.push_back(new Entity(sphereMesh, fabricMaterial));
-	entities.push_back(new Entity(coneMesh, giraffeMaterial));
-	entities.push_back(new Entity(torusMesh, rockMaterial));
-	entities.push_back(new Entity(cubeMesh, rustMaterial));
-
 	player = new Entity(cubeMesh, fabricMaterial);
 
 	player->SetPosition(XMFLOAT3(0, 0, -1));
@@ -345,63 +340,39 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
+	entities.clear();
 	camera->Update(deltaTime);
-
-	for (int i = 0; i < entities.size(); i++) {
-
-		//do various transformations on entities
-		switch (i)
+	float playerSpeed = 2.0f;
+	if (GetAsyncKeyState('A') & 0x8000) {
+		player->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+		if (player->GetPosition().x <= -8)
 		{
-		case 0:
-			//entities[i]->Translate(XMVectorSet(cos(totalTime) / 2, 0, 0, 0) * deltaTime * 2);
-			break;
-		case 1:
-			entities[i]->SetPosition(XMFLOAT3(-2.5, 1.5, 0));
-			entities[i]->Rotate(XMVectorSet(0, 0, 1, 0) * deltaTime);
-			break;
-		case 2:
-			entities[i]->Rotate(XMVectorSet(1, 0, 0, 0) * deltaTime);
-			entities[i]->SetPosition(XMFLOAT3(3, 0, 0));
-			break;
-		case 3:
-			entities[i]->SetPosition(XMFLOAT3(0, 0, -2));
-			entities[i]->Rotate(XMVectorSet(0, 0.5f, 0, 0) * deltaTime);
-		default:
-			break;
+			player->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
+		}
+	}
+	else if (GetAsyncKeyState('D') & 0x8000) {
+		player->SetPosition(XMFLOAT3(player->GetPosition().x + (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+		if (player->GetPosition().x >= 8)
+		{
+			player->SetPosition(XMFLOAT3(8, 0, player->GetPosition().z));
 		}
 	}
 
-	if (GetAsyncKeyState('A') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x - 0.01f, player->GetPosition().y, player->GetPosition().z));
-		if (player->GetPosition().x <= -10)
+
+	if (GetAsyncKeyState('W') & 0x8000) {
+		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + (playerSpeed * deltaTime)));
+		if (player->GetPosition().z >= 8)
 		{
-			player->SetPosition(XMFLOAT3(-10, 0, player->GetPosition().z));
+			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 8));
 		}
 	}
 	else if (GetAsyncKeyState('S') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - 0.01f));
-		if (player->GetPosition().z <= -10)
+		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - (playerSpeed * deltaTime)));
+		if (player->GetPosition().z <= -2)
 		{
-			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -10));
+			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -2));
 		}
 	}
-
-	else if (GetAsyncKeyState('D') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x + 0.01f, player->GetPosition().y, player->GetPosition().z));
-		if (player->GetPosition().x >= 10)
-		{
-			player->SetPosition(XMFLOAT3(10, 0, player->GetPosition().z));
-		}
-	}
-	else if (GetAsyncKeyState('W') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + 0.01f));
-		if (player->GetPosition().z >= 10)
-		{
-			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 10));
-		}
-	}
-
-	
 
 	if (GetAsyncKeyState('P') & 0x1) {
 		playerL = new Entity(sphereMesh, fabricMaterial);
@@ -410,25 +381,27 @@ void Game::Update(float deltaTime, float totalTime)
 		lasers.push_back(playerL);
 	}
 
+	float laserSpeed = 7.5f;
 	for (int i = 0; i < lasers.size(); i++)
 	{
-		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + 0.1f));
+
+		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
 		if (lasers[i]->GetPosition().z >= 50.0f && i < lasers.size())
 		{
+			delete lasers[i];
 			lasers.erase(lasers.begin() + i);
 		}
 	}
 
-	timer -= 0.1f;
+	timer -= deltaTime;
 	if (timer <= 0)
 	{
 		enemy = new Entity(torusMesh, rustMaterial);
 
-		timer = 1000.0f;
+		timer = 10.0f;
 		enemies.push_back(enemy);
 		for (int i = 0; i < enemies.size(); i++)
 		{
-
 			enemyL = new Entity(sphereMesh, rustMaterial);
 			enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 			enemyL->SetPosition(enemies[i]->GetPosition());
@@ -437,22 +410,23 @@ void Game::Update(float deltaTime, float totalTime)
 
 	}
 
+	float enemySpeed = 2.0f;
 	for (int i = 0; i < enemies.size(); i++)
 	{
-		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + 0.01f, enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
+		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
 		if (enemies[i]->GetPosition().x >= 50.0f && i < enemies.size())
 		{
-
+			delete enemies[i];
 			enemies.erase(enemies.begin() + i);
 		}
 	}
 
 	for (int i = 0; i < enemyLasers.size(); i++)
 	{
-		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - 0.1f));
+		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
 		if (enemyLasers[i]->GetPosition().z <= -50.0f && i < enemyLasers.size())
 		{
-
+			delete enemyLasers[i];
 			enemyLasers.erase(enemyLasers.begin() + i);
 		}
 	}
@@ -463,6 +437,12 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	//if (GetAsyncKeyState(VK_ESCAPE))
 	//	Quit();
+
+	// add all entities to entities for drawing
+	entities.push_back(player);
+	entities.insert(entities.end(), enemies.begin(), enemies.end());
+	entities.insert(entities.end(), lasers.begin(), lasers.end());
+	entities.insert(entities.end(), enemyLasers.begin(), enemyLasers.end());
 }
 
 // --------------------------------------------------------
@@ -537,145 +517,6 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->DrawIndexed(3, 0, 0);
 
 	}
-
-	player->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-	player->GetMaterial()->GetVertexShader()->CopyAllBufferData();
-
-
-	// Set the vertex and pixel shaders to use for the next Draw() command
-	//  - These don't technically need to be set every frame...YET
-	//  - Once you start applying different shaders to different objects,
-	//    you'll need to swap the current shaders before each draw
-	player->GetMaterial()->GetVertexShader()->SetShader();
-
-	// Send data to pixel shader
-	player->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-		&light, sizeof(DirectionalLight));
-	player->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-		&redDirLight, sizeof(DirectionalLight));
-	player->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-		&greenPointLight, sizeof(PointLight));
-	player->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-		&whitePointLight, sizeof(PointLight));
-	player->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-		camera->GetPosition());
-
-	player->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-	player->GetMaterial()->GetPixelShader()->SetShader();
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
-	ID3D11Buffer* vertexBuffer = player->GetMesh()->GetVertexBuffer();
-	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	context->IASetIndexBuffer(player->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-	context->DrawIndexed(player->GetMesh()->GetIndexCount(), 0, 0);
-	context->DrawIndexed(3, 0, 0);
-
-	for (int i = 0; i < lasers.size(); i++)
-	{
-		lasers[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-		lasers[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
-
-
-		// Set the vertex and pixel shaders to use for the next Draw() command
-		//  - These don't technically need to be set every frame...YET
-		//  - Once you start applying different shaders to different objects,
-		//    you'll need to swap the current shaders before each draw
-		lasers[i]->GetMaterial()->GetVertexShader()->SetShader();
-
-		// Send data to pixel shader
-		lasers[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-			&light, sizeof(DirectionalLight));
-		lasers[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-			&redDirLight, sizeof(DirectionalLight));
-		lasers[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-			&greenPointLight, sizeof(PointLight));
-		lasers[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-			&whitePointLight, sizeof(PointLight));
-		lasers[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-			camera->GetPosition());
-
-		lasers[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-		lasers[i]->GetMaterial()->GetPixelShader()->SetShader();
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		ID3D11Buffer* vertexBuffer = lasers[i]->GetMesh()->GetVertexBuffer();
-		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-		context->IASetIndexBuffer(lasers[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-		context->DrawIndexed(lasers[i]->GetMesh()->GetIndexCount(), 0, 0);
-		context->DrawIndexed(3, 0, 0);
-	}
-
-	for (int i = 0; i < enemyLasers.size(); i++)
-	{
-		enemyLasers[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-		enemyLasers[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
-
-
-		// Set the vertex and pixel shaders to use for the next Draw() command
-		//  - These don't technically need to be set every frame...YET
-		//  - Once you start applying different shaders to different objects,
-		//    you'll need to swap the current shaders before each draw
-		enemyLasers[i]->GetMaterial()->GetVertexShader()->SetShader();
-
-		// Send data to pixel shader
-		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-			&light, sizeof(DirectionalLight));
-		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-			&redDirLight, sizeof(DirectionalLight));
-		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-			&greenPointLight, sizeof(PointLight));
-		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-			&whitePointLight, sizeof(PointLight));
-		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-			camera->GetPosition());
-
-		enemyLasers[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-		enemyLasers[i]->GetMaterial()->GetPixelShader()->SetShader();
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		ID3D11Buffer* vertexBuffer = enemyLasers[i]->GetMesh()->GetVertexBuffer();
-		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-		context->IASetIndexBuffer(enemyLasers[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-		context->DrawIndexed(enemyLasers [i]->GetMesh()->GetIndexCount(), 0, 0);
-		context->DrawIndexed(3, 0, 0);
-	}
-
-	for (int i = 0; i < enemies.size(); i++)
-	{
-		enemies[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-		enemies[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
-
-
-		// Set the vertex and pixel shaders to use for the next Draw() command
-		//  - These don't technically need to be set every frame...YET
-		//  - Once you start applying different shaders to different objects,
-		//    you'll need to swap the current shaders before each draw
-		enemies[i]->GetMaterial()->GetVertexShader()->SetShader();
-
-		// Send data to pixel shader
-		enemies[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-			&light, sizeof(DirectionalLight));
-		enemies[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-			&redDirLight, sizeof(DirectionalLight));
-		enemies[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-			&greenPointLight, sizeof(PointLight));
-		enemies[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-			&whitePointLight, sizeof(PointLight));
-		enemies[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-			camera->GetPosition());
-
-		enemies[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-		enemies[i]->GetMaterial()->GetPixelShader()->SetShader();
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		ID3D11Buffer* vertexBuffer = enemies[i]->GetMesh()->GetVertexBuffer();
-		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-		context->IASetIndexBuffer(enemies[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-		context->DrawIndexed(enemies[i]->GetMesh()->GetIndexCount(), 0, 0);
-		context->DrawIndexed(3, 0, 0);
-	}
-
-
 	// Present the back buffer to the user
 	//  - Puts the final frame we're drawing into the window so the user can see it
 	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
@@ -728,11 +569,12 @@ void Game::OnMouseUp(WPARAM buttonState, int x, int y)
 void Game::OnMouseMove(WPARAM buttonState, int x, int y)
 {
 	// right mouse down
-	if (buttonState & 0x0002) {
-		float xDiff = (float)prevMousePos.x - x;
-		float yDiff = (float)prevMousePos.y - y;
-		camera->Rotate(xDiff / 500, yDiff / 500);
-	}
+	// uncomment for camera angle testing
+	//if (buttonState & 0x0002) {
+	//	float xDiff = (float)prevMousePos.x - x;
+	//	float yDiff = (float)prevMousePos.y - y;
+	//	camera->Rotate(xDiff / 500, yDiff / 500);
+	//}
 
 	// Save the previous mouse position, so we have it for the future
 	prevMousePos.x = x;
