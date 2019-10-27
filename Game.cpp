@@ -342,7 +342,7 @@ void Game::Update(float deltaTime, float totalTime)
 {
 	entities.clear();
 	camera->Update(deltaTime);
-	float playerSpeed = 2.0f;
+	float playerSpeed = 5.0f;
 	if (GetAsyncKeyState('A') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
 		if (player->GetPosition().x <= -8)
@@ -374,7 +374,7 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 	}
 
-	if (GetAsyncKeyState('P') & 0x1) {
+	if (GetAsyncKeyState('P') & 0x43) {
 		playerL = new Entity(sphereMesh, fabricMaterial);
 		playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 		playerL->SetPosition(player->GetPosition());
@@ -386,48 +386,83 @@ void Game::Update(float deltaTime, float totalTime)
 	{
 
 		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
-		if (lasers[i]->GetPosition().z >= 50.0f && i < lasers.size())
+		if (lasers[i]->GetPosition().z >= 30.0f && i < lasers.size())
 		{
 			delete lasers[i];
 			lasers.erase(lasers.begin() + i);
 		}
 	}
 
-	timer -= deltaTime;
-	if (timer <= 0)
+	timer -= 1.0f*deltaTime;
+
+	if (timer <= 0.0f)
 	{
-		enemy = new Entity(torusMesh, rustMaterial);
 
-		timer = 10.0f;
-		enemies.push_back(enemy);
-		for (int i = 0; i < enemies.size(); i++)
-		{
-			enemyL = new Entity(sphereMesh, rustMaterial);
-			enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
-			enemyL->SetPosition(enemies[i]->GetPosition());
-			enemyLasers.push_back(enemyL);
-		}
+			enemy = new Entity(torusMesh, fabricMaterial);
+			enemy->SetPosition(XMFLOAT3(-20, 0, 10));
+			enemies.push_back(enemy);
+			for (int i = 0; i < enemies.size(); i++)
+			{
+				if (enemies[i]->GetPosition().x >= -7.0f || enemies[i]->GetPosition().x <= 7.0f)
+				{
+					enemyL = new Entity(sphereMesh, fabricMaterial);
+					enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+					enemyL->SetPosition(enemies[i]->GetPosition());
+					enemyLasers.push_back(enemyL);
+				}
+			}	
 
+		timer = 3.0f;
 	}
 
-	float enemySpeed = 2.0f;
+
+	timer2 -= 2.0f * deltaTime;
+
+	if (timer2 <= 0.0f)
+	{
+	enemy = new Entity(torusMesh, fabricMaterial);
+	enemy->SetPosition(XMFLOAT3(20, 0, 15));
+	enemies2.push_back(enemy);
 	for (int i = 0; i < enemies.size(); i++)
 	{
-		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
-		if (enemies[i]->GetPosition().x >= 50.0f && i < enemies.size())
+		enemyL = new Entity(sphereMesh, fabricMaterial);
+		enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+		enemyL->SetPosition(enemies2[i]->GetPosition());
+		enemyLasers.push_back(enemyL);
+	}
+	
+		timer2 = 4.0f;
+	}
+
+
+	float enemySpeed = 3.0f;
+	for (int i = 0; i < enemies.size(); i++)
+	{
+		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed*1.2f * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
+		if (enemies[i]->GetPosition().x >= 30.0f && i < enemies.size())
 		{
 			delete enemies[i];
 			enemies.erase(enemies.begin() + i);
 		}
 	}
 
+	for (int i = 0; i < enemies2.size(); i++)
+	{
+		enemies2[i]->SetPosition(XMFLOAT3(enemies2[i]->GetPosition().x - (enemySpeed * deltaTime), enemies2[i]->GetPosition().y, enemies2[i]->GetPosition().z));
+		if (enemies2[i]->GetPosition().x <= -30.0f && i < enemies2.size())
+		{
+			delete enemies2[i];
+			enemies.erase(enemies2.begin() + i);
+		}
+	}
+
 	for (int i = 0; i < enemyLasers.size(); i++)
 	{
 		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
-		if (enemyLasers[i]->GetPosition().z <= -50.0f && i < enemyLasers.size())
+		if (enemyLasers[i]->GetPosition().z <= -3.0f && i < enemyLasers.size())
 		{
-			delete enemyLasers[i];
-			enemyLasers.erase(enemyLasers.begin() + i);
+				delete enemyLasers[i];
+				enemyLasers.erase(enemyLasers.begin() + i);
 		}
 	}
 
@@ -441,6 +476,7 @@ void Game::Update(float deltaTime, float totalTime)
 	// add all entities to entities for drawing
 	entities.push_back(player);
 	entities.insert(entities.end(), enemies.begin(), enemies.end());
+	entities.insert(entities.end(), enemies2.begin(), enemies2.end());
 	entities.insert(entities.end(), lasers.begin(), lasers.end());
 	entities.insert(entities.end(), enemyLasers.begin(), enemyLasers.end());
 }

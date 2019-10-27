@@ -68,10 +68,12 @@ private:
 
 	std::vector<Entity*> entities;
 	std::vector<Entity*> enemies;
+	std::vector<Entity*> enemies2;
 	std::vector<Entity*> lasers;
 	std::vector<Entity*> enemyLasers;
 
-	float timer = 1000.0f;
+	float timer = 3.0f;
+	float timer2 = 4.0f;
 
 	Camera* camera;
 
