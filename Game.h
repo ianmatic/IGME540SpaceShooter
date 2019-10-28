@@ -58,8 +58,8 @@ private:
 	Mesh* blueMesh;
 	Mesh* sphereMesh;
 	Mesh* coneMesh;
-	Mesh* torusMesh;
-	Mesh* cubeMesh;
+	Mesh* enemyMesh;
+	Mesh* playerMesh;
 
 	Entity* player;
 	Entity* enemy;

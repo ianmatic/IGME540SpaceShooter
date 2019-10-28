@@ -37,8 +37,8 @@ Game::Game(HINSTANCE hInstance)
 	greenMesh = 0;
 	sphereMesh = 0;
 	coneMesh = 0;
-	torusMesh = 0;
-	cubeMesh = 0;
+	enemyMesh = 0;
+	playerMesh = 0;
 
 	giraffeMaterial = 0;
 	fabricMaterial = 0;
@@ -100,8 +100,8 @@ Game::~Game()
 	delete blueMesh;
 	delete sphereMesh;
 	delete coneMesh;
-	delete cubeMesh;
-	delete torusMesh;
+	delete playerMesh;
+	delete enemyMesh;
 
 	delete giraffeMaterial;
 	delete fabricMaterial;
@@ -313,11 +313,11 @@ void Game::CreateBasicGeometry()
 
 	//Load in from files
 	coneMesh = new Mesh("../../assets/models/cone.obj", device);
-	torusMesh = new Mesh("../../assets/models/torus.obj", device);
+	enemyMesh = new Mesh("../../assets/models/torus.obj", device);
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
-	cubeMesh = new Mesh("../../assets/models/cube.obj", device);
+	playerMesh = new Mesh("../../assets/models/cube.obj", device);
 
-	player = new Entity(cubeMesh, fabricMaterial);
+	player = new Entity(playerMesh, fabricMaterial);
 
 	player->SetPosition(XMFLOAT3(0, 0, -1));
 }
@@ -398,7 +398,7 @@ void Game::Update(float deltaTime, float totalTime)
 	if (timer <= 0.0f)
 	{
 
-			enemy = new Entity(torusMesh, fabricMaterial);
+			enemy = new Entity(enemyMesh, fabricMaterial);
 			enemy->SetPosition(XMFLOAT3(-20, 0, 10));
 			enemies.push_back(enemy);
 			for (int i = 0; i < enemies.size(); i++)
@@ -420,7 +420,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 	if (timer2 <= 0.0f)
 	{
-	enemy = new Entity(torusMesh, fabricMaterial);
+	enemy = new Entity(enemyMesh, fabricMaterial);
 	enemy->SetPosition(XMFLOAT3(20, 0, 15));
 	enemies2.push_back(enemy);
 	for (int i = 0; i < enemies.size(); i++)
