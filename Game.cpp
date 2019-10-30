@@ -279,7 +279,7 @@ void Game::CreateBasicGeometry()
 	unsigned int redIndices[] = { 0, 1, 2 };
 
 	redMesh = new Mesh(redVertices, 3, redIndices, device);
-
+	redMesh->AttachCollider(redVertices);
 
 	Vertex greenVertices[] =
 	{
@@ -297,7 +297,7 @@ void Game::CreateBasicGeometry()
 		2, 4, 3 };
 
 	greenMesh = new Mesh(greenVertices, 9, greenIndices, device);
-
+	greenMesh->AttachCollider(greenVertices);
 
 	Vertex blueVertices[] =
 	{
@@ -310,12 +310,23 @@ void Game::CreateBasicGeometry()
 	unsigned int blueIndices[] = { 0, 1, 2, 0, 2, 3 };
 
 	blueMesh = new Mesh(blueVertices, 6, blueIndices, device);
-
+	blueMesh->AttachCollider(blueVertices);
 	//Load in from files
 	coneMesh = new Mesh("../../assets/models/cone.obj", device);
+	Vertex* coneVerts = coneMesh->GetVertsFromMesh();
+	coneMesh->AttachCollider(coneVerts);
+
 	enemyMesh = new Mesh("../../assets/models/torus.obj", device);
+	Vertex* enemyVerts = enemyMesh->GetVertsFromMesh();
+	enemyMesh->AttachCollider(enemyVerts);
+
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
+	Vertex* sphereVerts = sphereMesh->GetVertsFromMesh();
+	sphereMesh->AttachCollider(sphereVerts);
+
 	playerMesh = new Mesh("../../assets/models/cube.obj", device);
+	Vertex* playVerts = playerMesh->GetVertsFromMesh();
+	playerMesh->AttachCollider(playVerts);
 	//Change models later
 
 	player = new Entity(playerMesh, fabricMaterial);

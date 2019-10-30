@@ -191,7 +191,7 @@ Mesh::Mesh(const char* objFile, ID3D11Device* device)
 	//    one, you'll need to write some extra code to handle cases when you don't.
 
 	indexCount = vertCounter;
-
+	vertsFromMesh = &verts[0];
 	Init(&verts[0], vertCounter, &indices[0], device);
 }
 
@@ -321,6 +321,7 @@ Mesh::~Mesh()
 {
 	if (vertexBuffer) { vertexBuffer->Release(); }
 	if (indexBuffer) { indexBuffer->Release(); }
+	if (coll) delete coll;
 }
 
 ID3D11Buffer* Mesh::GetVertexBuffer()
@@ -336,4 +337,19 @@ ID3D11Buffer* Mesh::GetIndexBuffer()
 int Mesh::GetIndexCount()
 {
 	return indexCount;
+}
+
+void Mesh::AttachCollider(Vertex* vertices)
+{
+	if (coll)
+	{
+		delete coll;
+	}
+	coll = new Collision(vertices);
+	coll->GenAABB(vertices, indexCount);
+}
+
+Vertex* Mesh::GetVertsFromMesh()
+{
+	return vertsFromMesh;
 }
