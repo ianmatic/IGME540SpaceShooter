@@ -316,6 +316,7 @@ void Game::CreateBasicGeometry()
 	enemyMesh = new Mesh("../../assets/models/torus.obj", device);
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
 	playerMesh = new Mesh("../../assets/models/cube.obj", device);
+	//Change models later
 
 	player = new Entity(playerMesh, fabricMaterial);
 
