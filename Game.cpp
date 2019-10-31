@@ -399,6 +399,7 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 
 	float laserSpeed = 7.5f;
+	int i = 0;
 	for (int i = 0; i < lasers.size(); i++)
 	{
 		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
@@ -407,72 +408,49 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			delete lasers[i];
 			lasers.erase(lasers.begin() + i);
+			i--;
+			continue;
 		}
-
-
-		if (enemies.size() >= 1)
+	}
+	for (int i = 0; i < lasers.size(); i++) {
+		bool markContinue = false;
+		for (int j = 0; j < enemies.size(); j++)
 		{
-			for (int j = 0; j < enemies.size(); j++)
+			if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
 			{
-				if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
-				{
-					
-					int n = lasers.size();
-					int d = i - 1;
-					Entity* temp = lasers[0];
-					for (int k= 0; k < n - 1; k++)
-					{
-						lasers[k] = lasers[k + 1];
-					}
-					lasers[n - 1] = temp;
-					delete lasers[lasers.size()-1];
-					lasers.erase(lasers.begin() + lasers.size() - 1);
-
-
-				    n = enemies.size();
-					d = j - 1;
-					temp = enemies[0];
-					for (int k = 0; k < n - 1; k++)
-					{
-						enemies[k] = enemies[k + 1];
-					}
-					enemies[n - 1] = temp;
-					delete enemies[enemies.size()-1];
-					enemies.erase(enemies.begin() + enemies.size() - 1);
-				}
+				delete enemies[j];
+				enemies.erase(enemies.begin() + j);
+				--j;
+				markContinue = true;
+				continue;
+			}
+		}
+		if (markContinue) {
+			delete lasers[i];
+			lasers.erase(lasers.begin() + i);
+			--i;
+			continue;
+		}
+	}
+	for (int i = 0; i < lasers.size(); i++) {
+		bool markContinue = false;
+		for (int j = 0; j < enemies2.size(); j++)
+		{
+			if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
+			{
+				delete enemies2[j];
+				enemies2.erase(enemies2.begin() + j);
+				j--;
+				markContinue = true;
+				continue;
 			}
 		}
 
-		if (enemies2.size() >= 1)
-		{
-			for (int j = 0; j < enemies2.size(); j++)
-			{
-				if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
-				{
-					int n = lasers.size();
-					int d = i - 1;
-					Entity* temp = lasers[0];
-					for (int k = 0; k < n - 1; k++)
-					{
-						lasers[k] = lasers[k + 1];
-					}
-					lasers[n - 1] = temp;
-					delete lasers[lasers.size() - 1];
-					lasers.erase(lasers.begin() + lasers.size() - 1);
-
-
-					 n = enemies2.size();
-					 d = j - 1;
-					temp = enemies2[0];
-					for (int k = 0; k < n - 1; k++)
-					{
-						enemies2[k] = enemies2[k + 1];
-					}
-					enemies2[n - 1] = temp;
-					delete enemies2[enemies2.size() - 1];
-					enemies2.erase(enemies2.begin() + enemies2.size() - 1);
-				}
-			}
+		if (markContinue) {
+			delete lasers[i];
+			lasers.erase(lasers.begin() + i);
+			i--;
+			continue;
 		}
 	}
 
@@ -535,6 +513,8 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			delete enemies[i];
 			enemies.erase(enemies.begin() + i);
+			i--;
+			continue;
 		}
 	}
 
@@ -545,7 +525,9 @@ void Game::Update(float deltaTime, float totalTime)
 		if (enemies2[i]->GetPosition().x <= -30.0f && i < enemies2.size())
 		{
 			delete enemies2[i];
-			enemies.erase(enemies2.begin() + i);
+			enemies2.erase(enemies2.begin() + i);
+			i--;
+			continue;
 		}
 	}
 
@@ -557,24 +539,18 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			delete enemyLasers[i];
 			enemyLasers.erase(enemyLasers.begin() + i);
+			i--;
+			continue;
 		}
+	}
+	for (int i = 0 ; i < enemyLasers.size(); i++) {
 
 		if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
 		{
-			int n = enemyLasers.size();
-			int d = i - 1;
-			Entity* temp = enemyLasers[0];
-			for (int k = 0; k < n - 1; k++)
-			{
-				enemyLasers[k] = enemyLasers[k + 1];
-			}
-			enemyLasers[n - 1] = temp;
-			delete enemyLasers[enemyLasers.size() - 1];
-			enemyLasers.erase(enemyLasers.begin() + enemyLasers.size() - 1);
-
-			//delete enemyLasers[i];
-			//enemyLasers.erase(enemyLasers.begin() + i);
-			//delete player;
+			delete enemyLasers[i];
+			enemyLasers.erase(enemyLasers.begin() + i);
+			i--;
+			continue;
 		}
 	}
 

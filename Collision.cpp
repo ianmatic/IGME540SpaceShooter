@@ -1,6 +1,8 @@
 #include "Collision.h"
 Collision::Collision(Vertex* vertices)
 {
+	minCoord = DirectX::XMFLOAT3();
+	maxCoord = DirectX::XMFLOAT3();
 	this->vertices = vertices;
 }
 
