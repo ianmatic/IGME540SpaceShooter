@@ -30,6 +30,7 @@ Entity::Entity(Mesh* mesh, Material* material)
 	positionVec = DirectX::XMFLOAT3(0,0,0);
 	scaleVec = DirectX::XMFLOAT3(1,1,1);
 	rotationQuat = DirectX::XMFLOAT4(0,0,0,0);
+	coll = 0;
 }
 
 Entity::~Entity()

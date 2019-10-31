@@ -8,6 +8,7 @@ using namespace DirectX;
 // device == object that creates buffers
 Mesh::Mesh(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Device* device)
 {
+	vertsFromMesh = 0;
 	vertexBuffer = 0;
 	indexBuffer = 0;
 	indexCount = 0;
@@ -17,6 +18,7 @@ Mesh::Mesh(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Devi
 // Load files through this constructor
 Mesh::Mesh(const char* objFile, ID3D11Device* device)
 {
+	vertsFromMesh = 0;
 	vertexBuffer = 0;
 	indexBuffer = 0;
 	indexCount = 0;
