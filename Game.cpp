@@ -279,7 +279,7 @@ void Game::CreateBasicGeometry()
 	unsigned int redIndices[] = { 0, 1, 2 };
 
 	redMesh = new Mesh(redVertices, 3, redIndices, device);
-	redMesh->AttachCollider(redVertices);
+
 
 	Vertex greenVertices[] =
 	{
@@ -297,7 +297,7 @@ void Game::CreateBasicGeometry()
 		2, 4, 3 };
 
 	greenMesh = new Mesh(greenVertices, 9, greenIndices, device);
-	greenMesh->AttachCollider(greenVertices);
+
 
 	Vertex blueVertices[] =
 	{
@@ -310,28 +310,20 @@ void Game::CreateBasicGeometry()
 	unsigned int blueIndices[] = { 0, 1, 2, 0, 2, 3 };
 
 	blueMesh = new Mesh(blueVertices, 6, blueIndices, device);
-	blueMesh->AttachCollider(blueVertices);
+
 	//Load in from files
 	coneMesh = new Mesh("../../assets/models/cone.obj", device);
-	Vertex* coneVerts = coneMesh->GetVertsFromMesh();
-	coneMesh->AttachCollider(coneVerts);
 
 	enemyMesh = new Mesh("../../assets/models/torus.obj", device);
-	Vertex* enemyVerts = enemyMesh->GetVertsFromMesh();
-	enemyMesh->AttachCollider(enemyVerts);
-
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
-	Vertex* sphereVerts = sphereMesh->GetVertsFromMesh();
-	sphereMesh->AttachCollider(sphereVerts);
-
 	playerMesh = new Mesh("../../assets/models/cube.obj", device);
-	Vertex* playVerts = playerMesh->GetVertsFromMesh();
-	playerMesh->AttachCollider(playVerts);
+	
 	//Change models later
 
 	player = new Entity(playerMesh, fabricMaterial);
-
+	player->AttachCollider();
 	player->SetPosition(XMFLOAT3(0, 0, -1));
+	player->GetCollision()->SetPosition(XMFLOAT3(0, 0, -1));
 }
 
 
@@ -357,32 +349,43 @@ void Game::Update(float deltaTime, float totalTime)
 	float playerSpeed = 5.0f;
 	if (GetAsyncKeyState('A') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+		player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
 		if (player->GetPosition().x <= -8)
 		{
 			player->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
+			player->GetCollision()->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
 		}
 	}
 	else if (GetAsyncKeyState('D') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x + (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+		player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x + (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+
 		if (player->GetPosition().x >= 8)
 		{
 			player->SetPosition(XMFLOAT3(8, 0, player->GetPosition().z));
+			player->GetCollision()->SetPosition(XMFLOAT3(8, 0, player->GetPosition().z));
 		}
 	}
 
 
 	if (GetAsyncKeyState('W') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + (playerSpeed * deltaTime)));
+		player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + (playerSpeed * deltaTime)));
+
 		if (player->GetPosition().z >= 8)
 		{
 			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 8));
+			player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 8));
 		}
 	}
 	else if (GetAsyncKeyState('S') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - (playerSpeed * deltaTime)));
+		player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - (playerSpeed * deltaTime)));
+
 		if (player->GetPosition().z <= -2)
 		{
 			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -2));
+			player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -2));
 		}
 	}
 
@@ -390,18 +393,41 @@ void Game::Update(float deltaTime, float totalTime)
 		playerL = new Entity(sphereMesh, fabricMaterial);
 		playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 		playerL->SetPosition(player->GetPosition());
+		playerL->AttachCollider();
+		playerL->GetCollision()->SetPosition(player->GetPosition());
 		lasers.push_back(playerL);
 	}
 
 	float laserSpeed = 7.5f;
 	for (int i = 0; i < lasers.size(); i++)
 	{
-
 		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
+		lasers[i]->GetCollision()->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
 		if (lasers[i]->GetPosition().z >= 30.0f && i < lasers.size())
 		{
 			delete lasers[i];
 			lasers.erase(lasers.begin() + i);
+		}
+		for (int j = 0; j < enemies.size(); j++)
+		{
+			if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
+			{
+				delete lasers[i];
+				lasers.erase(lasers.begin() + i);
+				delete enemies[j];
+				enemies.erase(enemies.begin() + i);
+			}
+		}
+
+		for (int j = 0; j < enemies2.size(); j++)
+		{
+			if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
+			{
+				delete lasers[i];
+				lasers.erase(lasers.begin() + i);
+				delete enemies2[j];
+				enemies2.erase(enemies.begin() + i);
+			}
 		}
 	}
 
@@ -412,6 +438,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 			enemy = new Entity(enemyMesh, fabricMaterial);
 			enemy->SetPosition(XMFLOAT3(-20, 0, 10));
+			enemy->AttachCollider();
+			enemy->GetCollision()->SetPosition(XMFLOAT3(-20, 0, 10));
 			enemies.push_back(enemy);
 			for (int i = 0; i < enemies.size(); i++)
 			{
@@ -420,6 +448,8 @@ void Game::Update(float deltaTime, float totalTime)
 					enemyL = new Entity(sphereMesh, fabricMaterial);
 					enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 					enemyL->SetPosition(enemies[i]->GetPosition());
+					enemyL->AttachCollider();
+					enemyL->GetCollision()->SetPosition(enemies[i]->GetPosition());
 					enemyLasers.push_back(enemyL);
 				}
 			}	
@@ -432,16 +462,20 @@ void Game::Update(float deltaTime, float totalTime)
 
 	if (timer2 <= 0.0f)
 	{
-	enemy = new Entity(enemyMesh, fabricMaterial);
-	enemy->SetPosition(XMFLOAT3(20, 0, 15));
-	enemies2.push_back(enemy);
-	for (int i = 0; i < enemies.size(); i++)
-	{
-		enemyL = new Entity(sphereMesh, fabricMaterial);
-		enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
-		enemyL->SetPosition(enemies2[i]->GetPosition());
-		enemyLasers.push_back(enemyL);
-	}
+		enemy = new Entity(enemyMesh, fabricMaterial);
+		enemy->SetPosition(XMFLOAT3(20, 0, 15));
+		enemy->AttachCollider();
+		enemy->GetCollision()->SetPosition(XMFLOAT3(20, 0, 15));
+		enemies2.push_back(enemy);
+		for (int i = 0; i < enemies.size(); i++)
+		{
+			enemyL = new Entity(sphereMesh, fabricMaterial);
+			enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+			enemyL->SetPosition(enemies2[i]->GetPosition());		
+			enemyL->AttachCollider();
+			enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
+			enemyLasers.push_back(enemyL);
+		}
 	
 		timer2 = 4.0f;
 	}
@@ -451,6 +485,7 @@ void Game::Update(float deltaTime, float totalTime)
 	for (int i = 0; i < enemies.size(); i++)
 	{
 		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed*1.2f * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
+		enemies[i]->GetCollision()->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed * 1.2f * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
 		if (enemies[i]->GetPosition().x >= 30.0f && i < enemies.size())
 		{
 			delete enemies[i];
@@ -461,6 +496,7 @@ void Game::Update(float deltaTime, float totalTime)
 	for (int i = 0; i < enemies2.size(); i++)
 	{
 		enemies2[i]->SetPosition(XMFLOAT3(enemies2[i]->GetPosition().x - (enemySpeed * deltaTime), enemies2[i]->GetPosition().y, enemies2[i]->GetPosition().z));
+		enemies2[i]->GetCollision()->SetPosition(XMFLOAT3(enemies2[i]->GetPosition().x - (enemySpeed * deltaTime), enemies2[i]->GetPosition().y, enemies2[i]->GetPosition().z));
 		if (enemies2[i]->GetPosition().x <= -30.0f && i < enemies2.size())
 		{
 			delete enemies2[i];
@@ -471,10 +507,18 @@ void Game::Update(float deltaTime, float totalTime)
 	for (int i = 0; i < enemyLasers.size(); i++)
 	{
 		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
+		enemyLasers[i]->GetCollision()->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
 		if (enemyLasers[i]->GetPosition().z <= -3.0f && i < enemyLasers.size())
 		{
 				delete enemyLasers[i];
 				enemyLasers.erase(enemyLasers.begin() + i);
+		}
+
+		if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
+		{
+			delete enemyLasers[i];
+			enemyLasers.erase(enemyLasers.begin() + i);
+			//delete player;
 		}
 	}
 

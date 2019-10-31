@@ -11,7 +11,6 @@ Mesh::Mesh(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Devi
 	vertexBuffer = 0;
 	indexBuffer = 0;
 	indexCount = 0;
-
 	Init(vertices, numVertices, indices, device);
 }
 
@@ -21,7 +20,6 @@ Mesh::Mesh(const char* objFile, ID3D11Device* device)
 	vertexBuffer = 0;
 	indexBuffer = 0;
 	indexCount = 0;
-
 	// File input object
 	std::ifstream obj(objFile);
 
@@ -321,7 +319,6 @@ Mesh::~Mesh()
 {
 	if (vertexBuffer) { vertexBuffer->Release(); }
 	if (indexBuffer) { indexBuffer->Release(); }
-	if (coll) delete coll;
 }
 
 ID3D11Buffer* Mesh::GetVertexBuffer()
@@ -337,16 +334,6 @@ ID3D11Buffer* Mesh::GetIndexBuffer()
 int Mesh::GetIndexCount()
 {
 	return indexCount;
-}
-
-void Mesh::AttachCollider(Vertex* vertices)
-{
-	if (coll)
-	{
-		delete coll;
-	}
-	coll = new Collision(vertices);
-	coll->GenAABB(vertices, indexCount);
 }
 
 Vertex* Mesh::GetVertsFromMesh()

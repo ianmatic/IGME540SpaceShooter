@@ -35,6 +35,7 @@ Entity::Entity(Mesh* mesh, Material* material)
 Entity::~Entity()
 {
 	// Nothing to delete
+	delete coll;
 }
 
 Mesh* Entity::GetMesh()
@@ -143,4 +144,16 @@ void Entity::Rotate(DirectX::XMVECTOR rotation)
 
 	//convert the XMVECTOR then store it
 	DirectX::XMStoreFloat4(&rotationQuat, tempRotationQuat);
+}
+
+void Entity::AttachCollider()
+{
+	Vertex* verts = mesh->GetVertsFromMesh();
+	coll = new Collision(verts);
+	coll->GenAABB(verts, mesh->GetIndexCount());
+}
+
+Collision* Entity::GetCollision()
+{
+	return coll;
 }

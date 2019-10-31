@@ -3,6 +3,7 @@
 #include "Material.h"
 #include "Lights.h"
 #include <DirectXMath.h>
+#include "Collision.h"
 class Entity
 {
 	DirectX::XMFLOAT4X4 worldMat;
@@ -11,6 +12,7 @@ class Entity
 	DirectX::XMFLOAT4 rotationQuat;
 	Mesh* mesh;
 	Material* material;
+	Collision* coll;
 
 	void CalculateWorldMatrix();
 public:
@@ -18,6 +20,8 @@ public:
 	~Entity();
 
 	Mesh* GetMesh();
+	Collision* GetCollision();
+	void AttachCollider();
 
 	// Setters/Getter
 	void SetWorldMatrix(DirectX::XMFLOAT4X4 value);
