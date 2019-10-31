@@ -408,25 +408,70 @@ void Game::Update(float deltaTime, float totalTime)
 			delete lasers[i];
 			lasers.erase(lasers.begin() + i);
 		}
-		for (int j = 0; j < enemies.size(); j++)
+
+
+		if (enemies.size() >= 1)
 		{
-			if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
+			for (int j = 0; j < enemies.size(); j++)
 			{
-				delete lasers[i];
-				lasers.erase(lasers.begin() + i);
-				delete enemies[j];
-				enemies.erase(enemies.begin() + i);
+				if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
+				{
+					
+					int n = lasers.size();
+					int d = i - 1;
+					Entity* temp = lasers[0];
+					for (int k= 0; k < n - 1; k++)
+					{
+						lasers[k] = lasers[k + 1];
+					}
+					lasers[n - 1] = temp;
+					delete lasers[lasers.size()-1];
+					lasers.erase(lasers.begin() + lasers.size() - 1);
+
+
+				    n = enemies.size();
+					d = j - 1;
+					temp = enemies[0];
+					for (int k = 0; k < n - 1; k++)
+					{
+						enemies[k] = enemies[k + 1];
+					}
+					enemies[n - 1] = temp;
+					delete enemies[enemies.size()-1];
+					enemies.erase(enemies.begin() + enemies.size() - 1);
+				}
 			}
 		}
 
-		for (int j = 0; j < enemies2.size(); j++)
+		if (enemies2.size() >= 1)
 		{
-			if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
+			for (int j = 0; j < enemies2.size(); j++)
 			{
-				delete lasers[i];
-				lasers.erase(lasers.begin() + i);
-				delete enemies2[j];
-				enemies2.erase(enemies2.begin() + i);
+				if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
+				{
+					int n = lasers.size();
+					int d = i - 1;
+					Entity* temp = lasers[0];
+					for (int k = 0; k < n - 1; k++)
+					{
+						lasers[k] = lasers[k + 1];
+					}
+					lasers[n - 1] = temp;
+					delete lasers[lasers.size() - 1];
+					lasers.erase(lasers.begin() + lasers.size() - 1);
+
+
+					 n = enemies2.size();
+					 d = j - 1;
+					temp = enemies2[0];
+					for (int k = 0; k < n - 1; k++)
+					{
+						enemies2[k] = enemies2[k + 1];
+					}
+					enemies2[n - 1] = temp;
+					delete enemies2[enemies2.size() - 1];
+					enemies2.erase(enemies2.begin() + enemies2.size() - 1);
+				}
 			}
 		}
 	}
@@ -516,8 +561,19 @@ void Game::Update(float deltaTime, float totalTime)
 
 		if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
 		{
-			delete enemyLasers[i];
-			enemyLasers.erase(enemyLasers.begin() + i);
+			int n = enemyLasers.size();
+			int d = i - 1;
+			Entity* temp = enemyLasers[0];
+			for (int k = 0; k < n - 1; k++)
+			{
+				enemyLasers[k] = enemyLasers[k + 1];
+			}
+			enemyLasers[n - 1] = temp;
+			delete enemyLasers[enemyLasers.size() - 1];
+			enemyLasers.erase(enemyLasers.begin() + enemyLasers.size() - 1);
+
+			//delete enemyLasers[i];
+			//enemyLasers.erase(enemyLasers.begin() + i);
 			//delete player;
 		}
 	}
