@@ -400,7 +400,6 @@ void Game::Update(float deltaTime, float totalTime)
 
 	float laserSpeed = 7.5f;
 	int i = 0;
-	bool shouldDelete = false;
 	for (int i = 0; i < lasers.size(); i++)
 	{
 		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
@@ -409,35 +408,49 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			delete lasers[i];
 			lasers.erase(lasers.begin() + i);
-			--i;
+			i--;
+			continue;
 		}
 	}
 	for (int i = 0; i < lasers.size(); i++) {
+		bool markContinue = false;
 		for (int j = 0; j < enemies.size(); j++)
 		{
 			if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
 			{
-				delete lasers[i];
-				lasers.erase(lasers.begin() + i);
-				i--;
 				delete enemies[j];
 				enemies.erase(enemies.begin() + j);
-				j--;
+				--j;
+				markContinue = true;
+				continue;
 			}
+		}
+		if (markContinue) {
+			delete lasers[i];
+			lasers.erase(lasers.begin() + i);
+			--i;
+			continue;
 		}
 	}
 	for (int i = 0; i < lasers.size(); i++) {
+		bool markContinue = false;
 		for (int j = 0; j < enemies2.size(); j++)
 		{
 			if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
 			{
-				delete lasers[i];
-				lasers.erase(lasers.begin() + i);
-				i--;
 				delete enemies2[j];
 				enemies2.erase(enemies2.begin() + j);
 				j--;
+				markContinue = true;
+				continue;
 			}
+		}
+
+		if (markContinue) {
+			delete lasers[i];
+			lasers.erase(lasers.begin() + i);
+			i--;
+			continue;
 		}
 	}
 
@@ -500,6 +513,8 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			delete enemies[i];
 			enemies.erase(enemies.begin() + i);
+			i--;
+			continue;
 		}
 	}
 
@@ -510,7 +525,9 @@ void Game::Update(float deltaTime, float totalTime)
 		if (enemies2[i]->GetPosition().x <= -30.0f && i < enemies2.size())
 		{
 			delete enemies2[i];
-			enemies.erase(enemies2.begin() + i);
+			enemies2.erase(enemies2.begin() + i);
+			i--;
+			continue;
 		}
 	}
 
@@ -522,13 +539,18 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			delete enemyLasers[i];
 			enemyLasers.erase(enemyLasers.begin() + i);
+			i--;
+			continue;
 		}
+	}
+	for (int i = 0 ; i < enemyLasers.size(); i++) {
 
 		if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
 		{
 			delete enemyLasers[i];
 			enemyLasers.erase(enemyLasers.begin() + i);
-			//delete player;
+			i--;
+			continue;
 		}
 	}
 
