@@ -426,7 +426,7 @@ void Game::Update(float deltaTime, float totalTime)
 				delete lasers[i];
 				lasers.erase(lasers.begin() + i);
 				delete enemies2[j];
-				enemies2.erase(enemies.begin() + i);
+				enemies2.erase(enemies2.begin() + i);
 			}
 		}
 	}
@@ -510,8 +510,8 @@ void Game::Update(float deltaTime, float totalTime)
 		enemyLasers[i]->GetCollision()->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
 		if (enemyLasers[i]->GetPosition().z <= -3.0f && i < enemyLasers.size())
 		{
-				delete enemyLasers[i];
-				enemyLasers.erase(enemyLasers.begin() + i);
+			delete enemyLasers[i];
+			enemyLasers.erase(enemyLasers.begin() + i);
 		}
 
 		if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())

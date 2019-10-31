@@ -31,13 +31,13 @@ void Collision::SetScale(DirectX::XMFLOAT3 scale)
 
 void Collision::GenAABB(Vertex* vertices, int size)
 {
-	DirectX::XMFLOAT3 minX = { INT_MAX, 0, 0 };
-	DirectX::XMFLOAT3 minY = { 0, INT_MAX, 0 };
-	DirectX::XMFLOAT3 minZ = { 0, 0, INT_MAX };
+	DirectX::XMFLOAT3 minX = { (float)INT_MAX, 0, 0 };
+	DirectX::XMFLOAT3 minY = { 0, (float)INT_MAX, 0 };
+	DirectX::XMFLOAT3 minZ = { 0, 0, (float)INT_MAX };
 
-	DirectX::XMFLOAT3 maxX = { INT_MIN, 0, 0 };
-	DirectX::XMFLOAT3 maxY = { 0, INT_MIN, 0 };
-	DirectX::XMFLOAT3 maxZ = { 0, 0, INT_MIN };
+	DirectX::XMFLOAT3 maxX = { (float)INT_MIN, 0, 0 };
+	DirectX::XMFLOAT3 maxY = { 0, (float)INT_MIN, 0 };
+	DirectX::XMFLOAT3 maxZ = { 0, 0, (float)INT_MIN };
 
 	for (int i = 0; i < size; i++)
 	{
