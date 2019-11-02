@@ -45,6 +45,19 @@ Game::Game(HINSTANCE hInstance)
 	rustMaterial = 0;
 	rockMaterial = 0;
 
+	playerMaterial = 0;
+	enemyMaterial = 0;
+
+	enemyDiffuse1 = 0;
+	enemyDiffuse2 = 0;
+	enemySpec = 0;
+	enemyNormal = 0;
+	playerDiffuse = 0;
+	playerSpec = 0;
+	playerNormal = 0;
+
+
+
 	giraffeTextureSRV = 0;
 	rustTextureSRV = 0;
 	rustSpecularSRV = 0;
@@ -108,6 +121,9 @@ Game::~Game()
 	delete rustMaterial;
 	delete rockMaterial;
 
+	delete enemyMaterial;
+	delete playerMaterial;
+
 	giraffeTextureSRV->Release();
 	fabricTextureSRV->Release();
 	rustTextureSRV->Release();
@@ -115,6 +131,14 @@ Game::~Game()
 	rockTextureSRV->Release();
 	rockNormalMapSRV->Release();
 	samplerState->Release();
+
+	enemyDiffuse1->Release();
+	 enemyDiffuse2->Release();
+	 enemySpec->Release();
+	enemyNormal->Release();
+	playerDiffuse->Release();
+	playerSpec->Release();
+	playerNormal->Release();
 
 	delete camera;
 }
@@ -215,12 +239,34 @@ void Game::LoadShaders()
 		0,	// don't need reference to texture
 		&rockTextureSRV
 	);
+
+
 	CreateWICTextureFromFile(device,
 		context,
-		L"../../assets/textures/rockNormals.jpg",
+		L"../../assets/textures/ufo_diffuse.png",
 		0,	// don't need reference to texture
-		&rockNormalMapSRV
+		&enemyDiffuse1
 	);
+	CreateWICTextureFromFile(device,
+		context,
+		L"../../assets/textures/ufo_diffuse_glow.png",
+		0,	// don't need reference to texture
+		&enemyDiffuse2
+	);
+	CreateWICTextureFromFile(device,
+		context,
+		L"../../assets/textures/ufo_normal.png",
+		0,	// don't need reference to texture
+		&enemyNormal
+	);
+	CreateWICTextureFromFile(device,
+		context,
+		L"../../assets/textures/ufo_spec.png",
+		0,	// don't need reference to texture
+		&enemySpec
+	);
+
+
 
 	// Create Sampler State
 	D3D11_SAMPLER_DESC sampDesc = {};
@@ -239,6 +285,9 @@ void Game::LoadShaders()
 	rustMaterial = new Material(vertexShaderSpecularMap, pixelShaderSpecularMap, rustTextureSRV, rustSpecularSRV, 0, samplerState);
 	// normalMap
 	rockMaterial = new Material(vertexShaderNormalMap, pixelShaderNormalMap, rockTextureSRV, 0, rockNormalMapSRV, samplerState);
+
+	enemyMaterial = new Material(vertexShaderSpecularMap, pixelShaderSpecularMap, enemyDiffuse1, enemySpec, 0, samplerState);
+	playerMaterial = new Material(vertexShader, pixelShader, fabricTextureSRV, 0, 0, samplerState);
 }
 
 
@@ -320,7 +369,7 @@ void Game::CreateBasicGeometry()
 	
 	//Change models later
 
-	player = new Entity(playerMesh, fabricMaterial);
+	player = new Entity(playerMesh, playerMaterial);
 	player->AttachCollider();
 	player->SetPosition(XMFLOAT3(0, 0, -1));
 	player->GetCollision()->SetPosition(XMFLOAT3(0, 0, -1));
@@ -459,7 +508,7 @@ void Game::Update(float deltaTime, float totalTime)
 	if (timer <= 0.0f)
 	{
 
-			enemy = new Entity(enemyMesh, fabricMaterial);
+			enemy = new Entity(enemyMesh, enemyMaterial);
 			enemy->SetPosition(XMFLOAT3(-20, 0, 10));
 			enemy->AttachCollider();
 			enemy->GetCollision()->SetPosition(XMFLOAT3(-20, 0, 10));
@@ -468,7 +517,7 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				if (enemies[i]->GetPosition().x >= -7.0f || enemies[i]->GetPosition().x <= 7.0f)
 				{
-					enemyL = new Entity(sphereMesh, fabricMaterial);
+					enemyL = new Entity(sphereMesh, enemyMaterial);
 					enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 					enemyL->SetPosition(enemies[i]->GetPosition());
 					enemyL->AttachCollider();
@@ -485,14 +534,14 @@ void Game::Update(float deltaTime, float totalTime)
 
 	if (timer2 <= 0.0f)
 	{
-		enemy = new Entity(enemyMesh, fabricMaterial);
+		enemy = new Entity(enemyMesh, enemyMaterial);
 		enemy->SetPosition(XMFLOAT3(20, 0, 15));
 		enemy->AttachCollider();
 		enemy->GetCollision()->SetPosition(XMFLOAT3(20, 0, 15));
 		enemies2.push_back(enemy);
 		for (int i = 0; i < enemies.size(); i++)
 		{
-			enemyL = new Entity(sphereMesh, fabricMaterial);
+			enemyL = new Entity(sphereMesh, enemyMaterial);
 			enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
 			enemyL->SetPosition(enemies2[i]->GetPosition());		
 			enemyL->AttachCollider();

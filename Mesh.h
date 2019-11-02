@@ -1,6 +1,7 @@
 #pragma once
 #include "d3d11.h"
 #include "Vertex.h"
+#include "tiny_obj_loader.h"
 #include <iostream>
 #include <vector>
 #include <fstream>

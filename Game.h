@@ -81,12 +81,26 @@ private:
 	Material* fabricMaterial;
 	Material* rustMaterial;
 	Material* rockMaterial;
+
+	Material* enemyMaterial;
+	Material* playerMaterial;
+
 	ID3D11ShaderResourceView* giraffeTextureSRV;
 	ID3D11ShaderResourceView* fabricTextureSRV;
 	ID3D11ShaderResourceView* rustTextureSRV;
 	ID3D11ShaderResourceView* rustSpecularSRV;
 	ID3D11ShaderResourceView* rockTextureSRV;
 	ID3D11ShaderResourceView* rockNormalMapSRV;
+
+	ID3D11ShaderResourceView* enemyDiffuse1;
+	ID3D11ShaderResourceView* enemyDiffuse2;
+	ID3D11ShaderResourceView* enemySpec;
+	ID3D11ShaderResourceView* enemyNormal;
+	ID3D11ShaderResourceView* playerDiffuse;
+	ID3D11ShaderResourceView* playerSpec;
+	ID3D11ShaderResourceView* playerNormal;
+
+
 	ID3D11SamplerState* samplerState;
 
 	DirectionalLight light;
