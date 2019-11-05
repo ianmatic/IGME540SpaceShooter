@@ -372,7 +372,7 @@ void Game::CreateBasicGeometry()
 	player = new Entity(playerMesh, playerMaterial);
 	player->AttachCollider();
 	player->SetPosition(XMFLOAT3(0, 0, -1));
-	player->GetCollision()->SetPosition(XMFLOAT3(0, 0, -1));
+	player->GetCollision()->SetPosition(player->GetPosition());
 }
 
 
@@ -398,7 +398,7 @@ void Game::Update(float deltaTime, float totalTime)
 	float playerSpeed = 5.0f;
 	if (GetAsyncKeyState('A') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
-		player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+		player->GetCollision()->SetPosition(player->GetPosition());
 		if (player->GetPosition().x <= -8)
 		{
 			player->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
@@ -407,19 +407,19 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	else if (GetAsyncKeyState('D') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x + (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
-		player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x + (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+		player->GetCollision()->SetPosition(player->GetPosition());
 
 		if (player->GetPosition().x >= 8)
 		{
 			player->SetPosition(XMFLOAT3(8, 0, player->GetPosition().z));
-			player->GetCollision()->SetPosition(XMFLOAT3(8, 0, player->GetPosition().z));
+			player->GetCollision()->SetPosition(player->GetPosition());
 		}
 	}
 
 
 	if (GetAsyncKeyState('W') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + (playerSpeed * deltaTime)));
-		player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + (playerSpeed * deltaTime)));
+		player->GetCollision()->SetPosition(player->GetPosition());
 
 		if (player->GetPosition().z >= 8)
 		{
@@ -429,12 +429,12 @@ void Game::Update(float deltaTime, float totalTime)
 	}
 	else if (GetAsyncKeyState('S') & 0x8000) {
 		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - (playerSpeed * deltaTime)));
-		player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - (playerSpeed * deltaTime)));
+		player->GetCollision()->SetPosition(player->GetPosition());
 
 		if (player->GetPosition().z <= -2)
 		{
 			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -2));
-			player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -2));
+			player->GetCollision()->SetPosition(player->GetPosition());
 		}
 	}
 
@@ -444,6 +444,7 @@ void Game::Update(float deltaTime, float totalTime)
 		playerL->SetPosition(player->GetPosition());
 		playerL->AttachCollider();
 		playerL->GetCollision()->SetPosition(player->GetPosition());
+		playerL->GetCollision()->SetScale(playerL->GetScale());
 		lasers.push_back(playerL);
 	}
 
@@ -452,7 +453,7 @@ void Game::Update(float deltaTime, float totalTime)
 	for (int i = 0; i < lasers.size(); i++)
 	{
 		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
-		lasers[i]->GetCollision()->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
+		lasers[i]->GetCollision()->SetPosition(lasers[i]->GetPosition());
 		if (lasers[i]->GetPosition().z >= 30.0f && i < lasers.size())
 		{
 			delete lasers[i];
@@ -511,7 +512,7 @@ void Game::Update(float deltaTime, float totalTime)
 			enemy = new Entity(enemyMesh, enemyMaterial);
 			enemy->SetPosition(XMFLOAT3(-20, 0, 10));
 			enemy->AttachCollider();
-			enemy->GetCollision()->SetPosition(XMFLOAT3(-20, 0, 10));
+			enemy->GetCollision()->SetPosition(enemy->GetPosition());
 			enemies.push_back(enemy);
 			for (int i = 0; i < enemies.size(); i++)
 			{
@@ -522,6 +523,7 @@ void Game::Update(float deltaTime, float totalTime)
 					enemyL->SetPosition(enemies[i]->GetPosition());
 					enemyL->AttachCollider();
 					enemyL->GetCollision()->SetPosition(enemies[i]->GetPosition());
+					enemyL->GetCollision()->SetScale(enemies[i]->GetScale());
 					enemyLasers.push_back(enemyL);
 				}
 			}	
@@ -537,7 +539,7 @@ void Game::Update(float deltaTime, float totalTime)
 		enemy = new Entity(enemyMesh, enemyMaterial);
 		enemy->SetPosition(XMFLOAT3(20, 0, 15));
 		enemy->AttachCollider();
-		enemy->GetCollision()->SetPosition(XMFLOAT3(20, 0, 15));
+		enemy->GetCollision()->SetPosition(enemy->GetPosition());
 		enemies2.push_back(enemy);
 		for (int i = 0; i < enemies.size(); i++)
 		{
@@ -546,6 +548,7 @@ void Game::Update(float deltaTime, float totalTime)
 			enemyL->SetPosition(enemies2[i]->GetPosition());		
 			enemyL->AttachCollider();
 			enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
+			enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
 			enemyLasers.push_back(enemyL);
 		}
 	
@@ -557,7 +560,7 @@ void Game::Update(float deltaTime, float totalTime)
 	for (int i = 0; i < enemies.size(); i++)
 	{
 		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed*1.2f * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
-		enemies[i]->GetCollision()->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed * 1.2f * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
+		enemies[i]->GetCollision()->SetPosition(enemies[i]->GetPosition());
 		if (enemies[i]->GetPosition().x >= 30.0f && i < enemies.size())
 		{
 			delete enemies[i];
@@ -570,7 +573,7 @@ void Game::Update(float deltaTime, float totalTime)
 	for (int i = 0; i < enemies2.size(); i++)
 	{
 		enemies2[i]->SetPosition(XMFLOAT3(enemies2[i]->GetPosition().x - (enemySpeed * deltaTime), enemies2[i]->GetPosition().y, enemies2[i]->GetPosition().z));
-		enemies2[i]->GetCollision()->SetPosition(XMFLOAT3(enemies2[i]->GetPosition().x - (enemySpeed * deltaTime), enemies2[i]->GetPosition().y, enemies2[i]->GetPosition().z));
+		enemies2[i]->GetCollision()->SetPosition(enemies2[i]->GetPosition());
 		if (enemies2[i]->GetPosition().x <= -30.0f && i < enemies2.size())
 		{
 			delete enemies2[i];
@@ -583,7 +586,7 @@ void Game::Update(float deltaTime, float totalTime)
 	for (int i = 0; i < enemyLasers.size(); i++)
 	{
 		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
-		enemyLasers[i]->GetCollision()->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
+		enemyLasers[i]->GetCollision()->SetPosition(enemyLasers[i]->GetPosition());
 		if (enemyLasers[i]->GetPosition().z <= -3.0f && i < enemyLasers.size())
 		{
 			delete enemyLasers[i];
@@ -592,11 +595,14 @@ void Game::Update(float deltaTime, float totalTime)
 			continue;
 		}
 	}
-	for (int i = 0 ; i < enemyLasers.size(); i++) {
-
+	for (int i = 0 ; i < enemyLasers.size(); i++) 
+	{
+		std::cout << "Enemy Laser BB: \nMin: " << enemyLasers[i]->GetCollision()->GetMinCoord().x << " " << enemyLasers[i]->GetCollision()->GetMinCoord().y << " " << enemyLasers[i]->GetCollision()->GetMinCoord().z << "\nMax: " << enemyLasers[i]->GetCollision()->GetMaxCoord().x << " " << enemyLasers[i]->GetCollision()->GetMaxCoord().y << " " << enemyLasers[i]->GetCollision()->GetMaxCoord().z << "\n";
+		std::cout << "Player BB: \nMin: " << player->GetCollision()->GetMinCoord().x << " " << player->GetCollision()->GetMinCoord().y << " " << player->GetCollision()->GetMinCoord().z << "\nMax: " << player->GetCollision()->GetMaxCoord().x << " " << player->GetCollision()->GetMaxCoord().y << " " << player->GetCollision()->GetMaxCoord().z << "\n\n";
 		if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
 		{
 			delete enemyLasers[i];
+			delete player;
 			enemyLasers.erase(enemyLasers.begin() + i);
 			i--;
 			continue;
@@ -607,8 +613,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 
 	// Quit if the escape key is pressed
-	//if (GetAsyncKeyState(VK_ESCAPE))
-	//	Quit();
+	if (GetAsyncKeyState(VK_ESCAPE))
+		Quit();
 
 	// add all entities to entities for drawing
 	entities.push_back(player);

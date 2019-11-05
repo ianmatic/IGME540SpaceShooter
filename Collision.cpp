@@ -1,5 +1,5 @@
 #include "Collision.h"
-Collision::Collision(Vertex* vertices)
+Collision::Collision(std::vector<Vertex> vertices)
 {
 	minCoord = DirectX::XMFLOAT3();
 	maxCoord = DirectX::XMFLOAT3();
@@ -27,11 +27,19 @@ void Collision::SetScale(DirectX::XMFLOAT3 scale)
 	float halfWidthY = (maxCoord.y - minCoord.y) / 2;
 	float halfWidthZ = (maxCoord.z - minCoord.z) / 2;
 
+	DirectX::XMFLOAT3 center = {maxCoord.x - halfWidthX, maxCoord.y - halfWidthY, maxCoord.z = halfWidthZ};
+
+	halfWidthX *= scale.x;
+	halfWidthY *= scale.y;
+	halfWidthZ *= scale.z;
+
+	maxCoord = { center.x + halfWidthX, center.y + halfWidthY, center.z + halfWidthZ };
+	minCoord = { center.x - halfWidthX, center.y - halfWidthY, center.z - halfWidthZ };
 	//minCoord.x 
 	
 }
 
-void Collision::GenAABB(Vertex* vertices, int size)
+void Collision::GenAABB(std::vector<Vertex> vertices)
 {
 	DirectX::XMFLOAT3 minX = { (float)INT_MAX, 0, 0 };
 	DirectX::XMFLOAT3 minY = { 0, (float)INT_MAX, 0 };
@@ -41,7 +49,7 @@ void Collision::GenAABB(Vertex* vertices, int size)
 	DirectX::XMFLOAT3 maxY = { 0, (float)INT_MIN, 0 };
 	DirectX::XMFLOAT3 maxZ = { 0, 0, (float)INT_MIN };
 
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < vertices.size(); i++)
 	{
 		if (vertices[i].Position.x < minX.x)
 		{
@@ -80,14 +88,19 @@ bool Collision::CheckCollision(Collision* other)
 	DirectX::XMFLOAT3 otherMin = other->GetMinCoord();
 	DirectX::XMFLOAT3 otherMax = other->GetMaxCoord();
 
-	if (otherMin.x > this->minCoord.x && otherMax.x < this->maxCoord.x)
+	if (otherMin.x > this->minCoord.x && otherMin.x < this->maxCoord.x)
 	{
-		if (otherMin.y > this->minCoord.y && otherMax.y < this->maxCoord.y)
+		if (otherMin.z > this->minCoord.z && otherMin.z < this->maxCoord.z)
 		{
-			if (otherMin.z > this->minCoord.z && otherMax.z < this->maxCoord.z)
-			{
-				return true;
-			}
+			return true;
+		}
+	}
+
+	if (otherMax.x > this->minCoord.x && otherMax.x < this->maxCoord.x)
+	{
+		if (otherMax.z > this->minCoord.z && otherMax.z < this->maxCoord.z)
+		{
+			return true;
 		}
 	}
 	return false;

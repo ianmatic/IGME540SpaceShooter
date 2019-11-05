@@ -8,7 +8,7 @@ using namespace DirectX;
 // device == object that creates buffers
 Mesh::Mesh(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Device* device)
 {
-	vertsFromMesh = 0;
+	//vertsFromMesh = 0;
 	vertexBuffer = 0;
 	indexBuffer = 0;
 	indexCount = 0;
@@ -18,7 +18,7 @@ Mesh::Mesh(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Devi
 // Load files through this constructor
 Mesh::Mesh(const char* objFile, ID3D11Device* device)
 {
-	vertsFromMesh = 0;
+	//vertsFromMesh = 0;
 	vertexBuffer = 0;
 	indexBuffer = 0;
 	indexCount = 0;
@@ -191,13 +191,19 @@ Mesh::Mesh(const char* objFile, ID3D11Device* device)
 	//    one, you'll need to write some extra code to handle cases when you don't.
 
 	indexCount = vertCounter;
-	vertsFromMesh = &verts[0];
+	//vertsFromMesh = verts;
 	Init(&verts[0], vertCounter, &indices[0], device);
 }
 
 void Mesh::Init(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Device* device)
 {
 	indexCount = numVertices;
+	
+	for (int i = 0; i < indexCount; i++)
+	{
+		
+		vertsFromMesh.push_back(vertices[i]);
+	}
 
 	CalculateTangents(vertices, numVertices, indices);
 
@@ -471,7 +477,7 @@ int Mesh::GetIndexCount()
 	return indexCount;
 }
 
-Vertex* Mesh::GetVertsFromMesh()
+std::vector<Vertex> Mesh::GetVertsFromMesh()
 {
 	return vertsFromMesh;
 }

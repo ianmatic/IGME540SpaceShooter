@@ -149,9 +149,10 @@ void Entity::Rotate(DirectX::XMVECTOR rotation)
 
 void Entity::AttachCollider()
 {
-	Vertex* verts = mesh->GetVertsFromMesh();
+	std::vector<Vertex> verts = mesh->GetVertsFromMesh();
+
 	coll = new Collision(verts);
-	coll->GenAABB(verts, mesh->GetIndexCount());
+	coll->GenAABB(verts);
 }
 
 Collision* Entity::GetCollision()
