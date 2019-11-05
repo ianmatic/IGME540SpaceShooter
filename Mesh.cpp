@@ -198,6 +198,7 @@ Mesh::Mesh(const char* objFile, ID3D11Device* device)
 void Mesh::Init(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Device* device)
 {
 	indexCount = numVertices;
+	vertsFromMesh = vertices;
 
 	CalculateTangents(vertices, numVertices, indices);
 
