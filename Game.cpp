@@ -444,6 +444,7 @@ void Game::Update(float deltaTime, float totalTime)
 		playerL->SetPosition(player->GetPosition());
 		playerL->AttachCollider();
 		playerL->GetCollision()->SetPosition(player->GetPosition());
+		playerL->GetCollision()->SetScale(playerL->GetScale());
 		lasers.push_back(playerL);
 	}
 
@@ -522,6 +523,7 @@ void Game::Update(float deltaTime, float totalTime)
 					enemyL->SetPosition(enemies[i]->GetPosition());
 					enemyL->AttachCollider();
 					enemyL->GetCollision()->SetPosition(enemies[i]->GetPosition());
+					enemyL->GetCollision()->SetScale(enemies[i]->GetScale());
 					enemyLasers.push_back(enemyL);
 				}
 			}	
@@ -546,6 +548,7 @@ void Game::Update(float deltaTime, float totalTime)
 			enemyL->SetPosition(enemies2[i]->GetPosition());		
 			enemyL->AttachCollider();
 			enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
+			enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
 			enemyLasers.push_back(enemyL);
 		}
 	
@@ -607,8 +610,8 @@ void Game::Update(float deltaTime, float totalTime)
 
 
 	// Quit if the escape key is pressed
-	//if (GetAsyncKeyState(VK_ESCAPE))
-	//	Quit();
+	if (GetAsyncKeyState(VK_ESCAPE))
+		Quit();
 
 	// add all entities to entities for drawing
 	entities.push_back(player);

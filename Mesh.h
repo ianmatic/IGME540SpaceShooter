@@ -10,7 +10,7 @@ class Mesh
 {
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
-	Vertex* vertsFromMesh;
+	std::vector<Vertex> vertsFromMesh;
 	int indexCount;
 
 	void Init(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Device* device);
@@ -25,6 +25,6 @@ public:
 	ID3D11Buffer* GetVertexBuffer();
 	ID3D11Buffer* GetIndexBuffer();
 	int GetIndexCount();
-	Vertex* GetVertsFromMesh();
+	std::vector<Vertex> GetVertsFromMesh();
 };
 
