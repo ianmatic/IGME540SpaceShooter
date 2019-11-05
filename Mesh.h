@@ -13,6 +13,15 @@ class Mesh
 	Vertex* vertsFromMesh;
 	int indexCount;
 
+	std::string inputfile;
+	tinyobj::attrib_t attrib;
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
+	std::string warn;
+	std::string err;
+
+
+
 	void Init(Vertex* vertices, int numVertices, unsigned int indices[], ID3D11Device* device);
 
 public:
@@ -21,6 +30,8 @@ public:
 	~Mesh();
 
 	void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices);
+
+	void CalculateObject(Vertex* verts, int numVerts, unsigned int* indices,std::string object);
 
 	ID3D11Buffer* GetVertexBuffer();
 	ID3D11Buffer* GetIndexBuffer();
