@@ -90,23 +90,17 @@ bool Collision::CheckCollision(Collision* other)
 
 	if (otherMin.x > this->minCoord.x && otherMin.x < this->maxCoord.x)
 	{
-		if (otherMin.y > this->minCoord.y && otherMin.y < this->maxCoord.y)
+		if (otherMin.z > this->minCoord.z && otherMin.z < this->maxCoord.z)
 		{
-			if (otherMin.z > this->minCoord.z && otherMin.z < this->maxCoord.z)
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 
 	if (otherMax.x > this->minCoord.x && otherMax.x < this->maxCoord.x)
 	{
-		if (otherMax.y > this->minCoord.y && otherMax.y < this->maxCoord.y)
+		if (otherMax.z > this->minCoord.z && otherMax.z < this->maxCoord.z)
 		{
-			if (otherMax.z > this->minCoord.z && otherMax.z < this->maxCoord.z)
-			{
-				return true;
-			}
+			return true;
 		}
 	}
 	return false;
