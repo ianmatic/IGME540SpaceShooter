@@ -107,5 +107,7 @@ private:
 	DirectionalLight redDirLight;
 	PointLight greenPointLight;
 	PointLight whitePointLight;
+
+	bool isAlive;
 };
 

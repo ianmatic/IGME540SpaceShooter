@@ -39,6 +39,7 @@ Game::Game(HINSTANCE hInstance)
 	coneMesh = 0;
 	enemyMesh = 0;
 	playerMesh = 0;
+	isAlive = true;
 
 	giraffeMaterial = 0;
 	fabricMaterial = 0;
@@ -133,8 +134,8 @@ Game::~Game()
 	samplerState->Release();
 
 	enemyDiffuse1->Release();
-	 enemyDiffuse2->Release();
-	 enemySpec->Release();
+	enemyDiffuse2->Release();
+	enemySpec->Release();
 	enemyNormal->Release();
 	playerDiffuse->Release();
 	playerSpec->Release();
@@ -395,119 +396,121 @@ void Game::Update(float deltaTime, float totalTime)
 {
 	entities.clear();
 	camera->Update(deltaTime);
-	float playerSpeed = 5.0f;
-	if (GetAsyncKeyState('A') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
-		player->GetCollision()->SetPosition(player->GetPosition());
-		if (player->GetPosition().x <= -8)
-		{
-			player->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
-			player->GetCollision()->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
-		}
-	}
-	else if (GetAsyncKeyState('D') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x + (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
-		player->GetCollision()->SetPosition(player->GetPosition());
-
-		if (player->GetPosition().x >= 8)
-		{
-			player->SetPosition(XMFLOAT3(8, 0, player->GetPosition().z));
-			player->GetCollision()->SetPosition(player->GetPosition());
-		}
-	}
-
-
-	if (GetAsyncKeyState('W') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + (playerSpeed * deltaTime)));
-		player->GetCollision()->SetPosition(player->GetPosition());
-
-		if (player->GetPosition().z >= 8)
-		{
-			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 8));
-			player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 8));
-		}
-	}
-	else if (GetAsyncKeyState('S') & 0x8000) {
-		player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - (playerSpeed * deltaTime)));
-		player->GetCollision()->SetPosition(player->GetPosition());
-
-		if (player->GetPosition().z <= -2)
-		{
-			player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -2));
-			player->GetCollision()->SetPosition(player->GetPosition());
-		}
-	}
-
-	if (GetAsyncKeyState('P') & 0x43) {
-		playerL = new Entity(sphereMesh, fabricMaterial);
-		playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
-		playerL->SetPosition(player->GetPosition());
-		playerL->AttachCollider();
-		playerL->GetCollision()->SetPosition(player->GetPosition());
-		playerL->GetCollision()->SetScale(playerL->GetScale());
-		lasers.push_back(playerL);
-	}
-
-	float laserSpeed = 7.5f;
-	int i = 0;
-	for (int i = 0; i < lasers.size(); i++)
+	if (isAlive)
 	{
-		lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
-		lasers[i]->GetCollision()->SetPosition(lasers[i]->GetPosition());
-		if (lasers[i]->GetPosition().z >= 30.0f && i < lasers.size())
-		{
-			delete lasers[i];
-			lasers.erase(lasers.begin() + i);
-			i--;
-			continue;
-		}
-	}
-	for (int i = 0; i < lasers.size(); i++) {
-		bool markContinue = false;
-		for (int j = 0; j < enemies.size(); j++)
-		{
-			if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
+		float playerSpeed = 5.0f;
+		if (GetAsyncKeyState('A') & 0x8000) {
+			player->SetPosition(XMFLOAT3(player->GetPosition().x - (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+			player->GetCollision()->SetPosition(player->GetPosition());
+			if (player->GetPosition().x <= -8)
 			{
-				delete enemies[j];
-				enemies.erase(enemies.begin() + j);
-				--j;
-				markContinue = true;
-				continue;
+				player->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
+				player->GetCollision()->SetPosition(XMFLOAT3(-8, 0, player->GetPosition().z));
 			}
 		}
-		if (markContinue) {
-			delete lasers[i];
-			lasers.erase(lasers.begin() + i);
-			--i;
-			continue;
-		}
-	}
-	for (int i = 0; i < lasers.size(); i++) {
-		bool markContinue = false;
-		for (int j = 0; j < enemies2.size(); j++)
-		{
-			if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
+		else if (GetAsyncKeyState('D') & 0x8000) {
+			player->SetPosition(XMFLOAT3(player->GetPosition().x + (playerSpeed * deltaTime), player->GetPosition().y, player->GetPosition().z));
+			player->GetCollision()->SetPosition(player->GetPosition());
+
+			if (player->GetPosition().x >= 8)
 			{
-				delete enemies2[j];
-				enemies2.erase(enemies2.begin() + j);
-				j--;
-				markContinue = true;
-				continue;
+				player->SetPosition(XMFLOAT3(8, 0, player->GetPosition().z));
+				player->GetCollision()->SetPosition(player->GetPosition());
 			}
 		}
 
-		if (markContinue) {
-			delete lasers[i];
-			lasers.erase(lasers.begin() + i);
-			i--;
-			continue;
+
+		if (GetAsyncKeyState('W') & 0x8000) {
+			player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z + (playerSpeed * deltaTime)));
+			player->GetCollision()->SetPosition(player->GetPosition());
+
+			if (player->GetPosition().z >= 8)
+			{
+				player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 8));
+				player->GetCollision()->SetPosition(XMFLOAT3(player->GetPosition().x, 0, 8));
+			}
 		}
-	}
+		else if (GetAsyncKeyState('S') & 0x8000) {
+			player->SetPosition(XMFLOAT3(player->GetPosition().x, player->GetPosition().y, player->GetPosition().z - (playerSpeed * deltaTime)));
+			player->GetCollision()->SetPosition(player->GetPosition());
 
-	timer -= 1.0f*deltaTime;
+			if (player->GetPosition().z <= -2)
+			{
+				player->SetPosition(XMFLOAT3(player->GetPosition().x, 0, -2));
+				player->GetCollision()->SetPosition(player->GetPosition());
+			}
+		}
 
-	if (timer <= 0.0f)
-	{
+		if (GetAsyncKeyState('P') & 0x43) {
+			playerL = new Entity(sphereMesh, fabricMaterial);
+			playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+			playerL->SetPosition(player->GetPosition());
+			playerL->AttachCollider();
+			playerL->GetCollision()->SetPosition(player->GetPosition());
+			playerL->GetCollision()->SetScale(playerL->GetScale());
+			lasers.push_back(playerL);
+		}
+
+		float laserSpeed = 7.5f;
+		int i = 0;
+		for (int i = 0; i < lasers.size(); i++)
+		{
+			lasers[i]->SetPosition(XMFLOAT3(lasers[i]->GetPosition().x, lasers[i]->GetPosition().y, lasers[i]->GetPosition().z + (laserSpeed * deltaTime)));
+			lasers[i]->GetCollision()->SetPosition(lasers[i]->GetPosition());
+			if (lasers[i]->GetPosition().z >= 30.0f && i < lasers.size())
+			{
+				delete lasers[i];
+				lasers.erase(lasers.begin() + i);
+				i--;
+				continue;
+			}
+		}
+		for (int i = 0; i < lasers.size(); i++) {
+			bool markContinue = false;
+			for (int j = 0; j < enemies.size(); j++)
+			{
+				if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
+				{
+					delete enemies[j];
+					enemies.erase(enemies.begin() + j);
+					--j;
+					markContinue = true;
+					continue;
+				}
+			}
+			if (markContinue) {
+				delete lasers[i];
+				lasers.erase(lasers.begin() + i);
+				--i;
+				continue;
+			}
+		}
+		for (int i = 0; i < lasers.size(); i++) {
+			bool markContinue = false;
+			for (int j = 0; j < enemies2.size(); j++)
+			{
+				if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
+				{
+					delete enemies2[j];
+					enemies2.erase(enemies2.begin() + j);
+					j--;
+					markContinue = true;
+					continue;
+				}
+			}
+
+			if (markContinue) {
+				delete lasers[i];
+				lasers.erase(lasers.begin() + i);
+				i--;
+				continue;
+			}
+		}
+
+		timer -= 1.0f * deltaTime;
+
+		if (timer <= 0.0f)
+		{
 
 			enemy = new Entity(enemyMesh, enemyMaterial);
 			enemy->SetPosition(XMFLOAT3(-20, 0, 10));
@@ -526,102 +529,104 @@ void Game::Update(float deltaTime, float totalTime)
 					enemyL->GetCollision()->SetScale(enemies[i]->GetScale());
 					enemyLasers.push_back(enemyL);
 				}
-			}	
+			}
 
-		timer = 3.0f;
-	}
+			timer = 3.0f;
+		}
 
 
-	timer2 -= 2.0f * deltaTime;
+		timer2 -= 2.0f * deltaTime;
 
-	if (timer2 <= 0.0f)
-	{
-		enemy = new Entity(enemyMesh, enemyMaterial);
-		enemy->SetPosition(XMFLOAT3(20, 0, 15));
-		enemy->AttachCollider();
-		enemy->GetCollision()->SetPosition(enemy->GetPosition());
-		enemies2.push_back(enemy);
+		if (timer2 <= 0.0f)
+		{
+			enemy = new Entity(enemyMesh, enemyMaterial);
+			enemy->SetPosition(XMFLOAT3(20, 0, 15));
+			enemy->AttachCollider();
+			enemy->GetCollision()->SetPosition(enemy->GetPosition());
+			enemies2.push_back(enemy);
+			for (int i = 0; i < enemies.size(); i++)
+			{
+				enemyL = new Entity(sphereMesh, enemyMaterial);
+				enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+				enemyL->SetPosition(enemies2[i]->GetPosition());
+				enemyL->AttachCollider();
+				enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
+				enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
+				enemyLasers.push_back(enemyL);
+			}
+
+			timer2 = 4.0f;
+		}
+
+
+		float enemySpeed = 3.0f;
 		for (int i = 0; i < enemies.size(); i++)
 		{
-			enemyL = new Entity(sphereMesh, enemyMaterial);
-			enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
-			enemyL->SetPosition(enemies2[i]->GetPosition());		
-			enemyL->AttachCollider();
-			enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
-			enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
-			enemyLasers.push_back(enemyL);
+			enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed * 1.2f * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
+			enemies[i]->GetCollision()->SetPosition(enemies[i]->GetPosition());
+			if (enemies[i]->GetPosition().x >= 30.0f && i < enemies.size())
+			{
+				delete enemies[i];
+				enemies.erase(enemies.begin() + i);
+				i--;
+				continue;
+			}
 		}
-	
-		timer2 = 4.0f;
-	}
 
-
-	float enemySpeed = 3.0f;
-	for (int i = 0; i < enemies.size(); i++)
-	{
-		enemies[i]->SetPosition(XMFLOAT3(enemies[i]->GetPosition().x + (enemySpeed*1.2f * deltaTime), enemies[i]->GetPosition().y, enemies[i]->GetPosition().z));
-		enemies[i]->GetCollision()->SetPosition(enemies[i]->GetPosition());
-		if (enemies[i]->GetPosition().x >= 30.0f && i < enemies.size())
+		for (int i = 0; i < enemies2.size(); i++)
 		{
-			delete enemies[i];
-			enemies.erase(enemies.begin() + i);
-			i--;
-			continue;
+			enemies2[i]->SetPosition(XMFLOAT3(enemies2[i]->GetPosition().x - (enemySpeed * deltaTime), enemies2[i]->GetPosition().y, enemies2[i]->GetPosition().z));
+			enemies2[i]->GetCollision()->SetPosition(enemies2[i]->GetPosition());
+			if (enemies2[i]->GetPosition().x <= -30.0f && i < enemies2.size())
+			{
+				delete enemies2[i];
+				enemies2.erase(enemies2.begin() + i);
+				i--;
+				continue;
+			}
 		}
-	}
 
-	for (int i = 0; i < enemies2.size(); i++)
-	{
-		enemies2[i]->SetPosition(XMFLOAT3(enemies2[i]->GetPosition().x - (enemySpeed * deltaTime), enemies2[i]->GetPosition().y, enemies2[i]->GetPosition().z));
-		enemies2[i]->GetCollision()->SetPosition(enemies2[i]->GetPosition());
-		if (enemies2[i]->GetPosition().x <= -30.0f && i < enemies2.size())
+		for (int i = 0; i < enemyLasers.size(); i++)
 		{
-			delete enemies2[i];
-			enemies2.erase(enemies2.begin() + i);
-			i--;
-			continue;
+			enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
+			enemyLasers[i]->GetCollision()->SetPosition(enemyLasers[i]->GetPosition());
+			if (enemyLasers[i]->GetPosition().z <= -3.0f && i < enemyLasers.size())
+			{
+				delete enemyLasers[i];
+				enemyLasers.erase(enemyLasers.begin() + i);
+				i--;
+				continue;
+			}
 		}
-	}
-
-	for (int i = 0; i < enemyLasers.size(); i++)
-	{
-		enemyLasers[i]->SetPosition(XMFLOAT3(enemyLasers[i]->GetPosition().x, enemyLasers[i]->GetPosition().y, enemyLasers[i]->GetPosition().z - (enemySpeed * deltaTime)));
-		enemyLasers[i]->GetCollision()->SetPosition(enemyLasers[i]->GetPosition());
-		if (enemyLasers[i]->GetPosition().z <= -3.0f && i < enemyLasers.size())
+		for (int i = 0; i < enemyLasers.size(); i++)
 		{
-			delete enemyLasers[i];
-			enemyLasers.erase(enemyLasers.begin() + i);
-			i--;
-			continue;
+			std::cout << "Enemy Laser BB: \nMin: " << enemyLasers[i]->GetCollision()->GetMinCoord().x << " " << enemyLasers[i]->GetCollision()->GetMinCoord().y << " " << enemyLasers[i]->GetCollision()->GetMinCoord().z << "\nMax: " << enemyLasers[i]->GetCollision()->GetMaxCoord().x << " " << enemyLasers[i]->GetCollision()->GetMaxCoord().y << " " << enemyLasers[i]->GetCollision()->GetMaxCoord().z << "\n";
+			std::cout << "Player BB: \nMin: " << player->GetCollision()->GetMinCoord().x << " " << player->GetCollision()->GetMinCoord().y << " " << player->GetCollision()->GetMinCoord().z << "\nMax: " << player->GetCollision()->GetMaxCoord().x << " " << player->GetCollision()->GetMaxCoord().y << " " << player->GetCollision()->GetMaxCoord().z << "\n\n";
+			if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
+			{
+				delete enemyLasers[i];
+				delete player;
+				enemyLasers.erase(enemyLasers.begin() + i);
+				i = enemyLasers.size();
+				isAlive = false;
+				break;
+			}
 		}
+
+		greenPointLight.position.x += cos(totalTime) * deltaTime;
+
+
+		// Quit if the escape key is pressed
+		if (GetAsyncKeyState(VK_ESCAPE))
+			Quit();
+
+		// add all entities to entities for drawing
+		entities.push_back(player);
+		entities.insert(entities.end(), enemies.begin(), enemies.end());
+		entities.insert(entities.end(), enemies2.begin(), enemies2.end());
+		entities.insert(entities.end(), lasers.begin(), lasers.end());
+		entities.insert(entities.end(), enemyLasers.begin(), enemyLasers.end());
 	}
-	for (int i = 0 ; i < enemyLasers.size(); i++) 
-	{
-		std::cout << "Enemy Laser BB: \nMin: " << enemyLasers[i]->GetCollision()->GetMinCoord().x << " " << enemyLasers[i]->GetCollision()->GetMinCoord().y << " " << enemyLasers[i]->GetCollision()->GetMinCoord().z << "\nMax: " << enemyLasers[i]->GetCollision()->GetMaxCoord().x << " " << enemyLasers[i]->GetCollision()->GetMaxCoord().y << " " << enemyLasers[i]->GetCollision()->GetMaxCoord().z << "\n";
-		std::cout << "Player BB: \nMin: " << player->GetCollision()->GetMinCoord().x << " " << player->GetCollision()->GetMinCoord().y << " " << player->GetCollision()->GetMinCoord().z << "\nMax: " << player->GetCollision()->GetMaxCoord().x << " " << player->GetCollision()->GetMaxCoord().y << " " << player->GetCollision()->GetMaxCoord().z << "\n\n";
-		if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
-		{
-			delete enemyLasers[i];
-			delete player;
-			enemyLasers.erase(enemyLasers.begin() + i);
-			i--;
-			continue;
-		}
-	}
-
-	greenPointLight.position.x += cos(totalTime) * deltaTime;
-
-
-	// Quit if the escape key is pressed
-	if (GetAsyncKeyState(VK_ESCAPE))
-		Quit();
-
-	// add all entities to entities for drawing
-	entities.push_back(player);
-	entities.insert(entities.end(), enemies.begin(), enemies.end());
-	entities.insert(entities.end(), enemies2.begin(), enemies2.end());
-	entities.insert(entities.end(), lasers.begin(), lasers.end());
-	entities.insert(entities.end(), enemyLasers.begin(), enemyLasers.end());
 }
 
 // --------------------------------------------------------
@@ -629,81 +634,83 @@ void Game::Update(float deltaTime, float totalTime)
 // --------------------------------------------------------
 void Game::Draw(float deltaTime, float totalTime)
 {
+	if (isAlive)
+	{
+		// Background color (Cornflower Blue in this case) for clearing
+		const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
 
-	// Background color (Cornflower Blue in this case) for clearing
-	const float color[4] = { 0.4f, 0.6f, 0.75f, 0.0f };
+		// Clear the render target and depth buffer (erases what's on the screen)
+		//  - Do this ONCE PER FRAME
+		//  - At the beginning of Draw (before drawing *anything*)
+		context->ClearRenderTargetView(backBufferRTV, color);
+		context->ClearDepthStencilView(
+			depthStencilView,
+			D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+			1.0f,
+			0);
 
-	// Clear the render target and depth buffer (erases what's on the screen)
-	//  - Do this ONCE PER FRAME
-	//  - At the beginning of Draw (before drawing *anything*)
-	context->ClearRenderTargetView(backBufferRTV, color);
-	context->ClearDepthStencilView(
-		depthStencilView,
-		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-		1.0f,
-		0);
+		// Send data to shader variables
+		//  - This is actually a complex process of copying data to a local buffer
+		//    and then copying that entire buffer to the GPU.  
+		//  - The "SimpleShader" class handles all of that for you.
+		for (int i = 0; i < entities.size(); i++) {
 
-	// Send data to shader variables
-	//  - This is actually a complex process of copying data to a local buffer
-	//    and then copying that entire buffer to the GPU.  
-	//  - The "SimpleShader" class handles all of that for you.
-	for (int i = 0; i < entities.size(); i++) {
+			// Setup Vertex and Pixel Shaders
+			entities[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
 
-		// Setup Vertex and Pixel Shaders
-		entities[i]->PrepareMaterial(camera->GetViewMatrix(), camera->GetProjectionMatrix());
-
-		// Once you've set all of the data you care to change for
-		// the next draw call, you need to actually send it to the GPU
-		//  - If you skip this, the "SetMatrix" calls above won't make it to the GPU!
-		entities[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
+			// Once you've set all of the data you care to change for
+			// the next draw call, you need to actually send it to the GPU
+			//  - If you skip this, the "SetMatrix" calls above won't make it to the GPU!
+			entities[i]->GetMaterial()->GetVertexShader()->CopyAllBufferData();
 
 
-		// Set the vertex and pixel shaders to use for the next Draw() command
-		//  - These don't technically need to be set every frame...YET
-		//  - Once you start applying different shaders to different objects,
-		//    you'll need to swap the current shaders before each draw
-		entities[i]->GetMaterial()->GetVertexShader()->SetShader();
+			// Set the vertex and pixel shaders to use for the next Draw() command
+			//  - These don't technically need to be set every frame...YET
+			//  - Once you start applying different shaders to different objects,
+			//    you'll need to swap the current shaders before each draw
+			entities[i]->GetMaterial()->GetVertexShader()->SetShader();
 
-		// Send data to pixel shader
-		entities[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
-			&light, sizeof(DirectionalLight));
-		entities[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
-			&redDirLight, sizeof(DirectionalLight));
-		entities[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
-			&greenPointLight, sizeof(PointLight));
-		entities[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
-			&whitePointLight, sizeof(PointLight));
-		entities[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
-			camera->GetPosition());
+			// Send data to pixel shader
+			entities[i]->GetMaterial()->GetPixelShader()->SetData("light", //name of variable in shader
+				&light, sizeof(DirectionalLight));
+			entities[i]->GetMaterial()->GetPixelShader()->SetData("secondLight", //name of variable in shader
+				&redDirLight, sizeof(DirectionalLight));
+			entities[i]->GetMaterial()->GetPixelShader()->SetData("pointLight", //name of variable in shader
+				&greenPointLight, sizeof(PointLight));
+			entities[i]->GetMaterial()->GetPixelShader()->SetData("secondPointLight", //name of variable in shader
+				&whitePointLight, sizeof(PointLight));
+			entities[i]->GetMaterial()->GetPixelShader()->SetFloat3("cameraPosition", //name of variable in shader
+				camera->GetPosition());
 
-		entities[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
-		entities[i]->GetMaterial()->GetPixelShader()->SetShader();
+			entities[i]->GetMaterial()->GetPixelShader()->CopyAllBufferData();
+			entities[i]->GetMaterial()->GetPixelShader()->SetShader();
 
-		// Set buffers in the input assembler
-		//  - Do this ONCE PER OBJECT you're drawing, since each object might
-		//    have different geometry.
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
-		ID3D11Buffer* vertexBuffer = entities[i]->GetMesh()->GetVertexBuffer();
-		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-		context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
-		context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
-		// Finally do the actual drawing
-		//  - Do this ONCE PER OBJECT you intend to draw
-		//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
-		//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
-		//     vertices in the currently set VERTEX BUFFER
-		context->DrawIndexed(3, 0, 0);
+			// Set buffers in the input assembler
+			//  - Do this ONCE PER OBJECT you're drawing, since each object might
+			//    have different geometry.
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
+			ID3D11Buffer* vertexBuffer = entities[i]->GetMesh()->GetVertexBuffer();
+			context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+			context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
+			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
+			// Finally do the actual drawing
+			//  - Do this ONCE PER OBJECT you intend to draw
+			//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
+			//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
+			//     vertices in the currently set VERTEX BUFFER
+			context->DrawIndexed(3, 0, 0);
 
+		}
+		// Present the back buffer to the user
+		//  - Puts the final frame we're drawing into the window so the user can see it
+		//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
+		swapChain->Present(0, 0);
+
+		// Due to the usage of a more sophisticated swap chain effect,
+		// the render target must be re-bound after every call to Present()
+		context->OMSetRenderTargets(1, &backBufferRTV, depthStencilView);
 	}
-	// Present the back buffer to the user
-	//  - Puts the final frame we're drawing into the window so the user can see it
-	//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
-	swapChain->Present(0, 0);
-
-	// Due to the usage of a more sophisticated swap chain effect,
-	// the render target must be re-bound after every call to Present()
-	context->OMSetRenderTargets(1, &backBufferRTV, depthStencilView);
 }
 
 
