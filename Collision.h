@@ -13,6 +13,7 @@ class Collision
 public:
 	//Collision constructors -- you can either pass in the entire vertex array from the model, or pass in the mesh (and it will grab the vertices from there)
 	Collision(std::vector<Vertex> vertices);
+	~Collision();
 	//check for collisions using this collider's AABB and another collider's AABB
 	bool CheckCollision(Collision* other);
 

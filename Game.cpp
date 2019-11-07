@@ -616,9 +616,7 @@ void Game::Update(float deltaTime, float totalTime)
 		greenPointLight.position.x += cos(totalTime) * deltaTime;
 
 
-		// Quit if the escape key is pressed
-		if (GetAsyncKeyState(VK_ESCAPE))
-			Quit();
+		
 
 		// add all entities to entities for drawing
 		entities.push_back(player);
@@ -626,6 +624,14 @@ void Game::Update(float deltaTime, float totalTime)
 		entities.insert(entities.end(), enemies2.begin(), enemies2.end());
 		entities.insert(entities.end(), lasers.begin(), lasers.end());
 		entities.insert(entities.end(), enemyLasers.begin(), enemyLasers.end());
+	}
+	// Quit if the escape key is pressed
+	if (GetAsyncKeyState(VK_ESCAPE))
+		Quit();
+	if (!isAlive)
+	{
+		entities.clear();
+		Quit();
 	}
 }
 

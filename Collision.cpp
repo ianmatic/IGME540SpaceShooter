@@ -6,6 +6,11 @@ Collision::Collision(std::vector<Vertex> vertices)
 	this->vertices = vertices;
 }
 
+Collision::~Collision()
+{
+	vertices.clear();
+}
+
 void Collision::SetPosition(DirectX::XMFLOAT3 pos)
 {
 	float halfWidthX = (maxCoord.x - minCoord.x) / 2;
