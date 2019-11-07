@@ -364,7 +364,7 @@ void Game::CreateBasicGeometry()
 	//Load in from files
 	coneMesh = new Mesh("../../assets/models/cone.obj", device);
 
-	enemyMesh = new Mesh("../../assets/models/torus.obj", device);
+	enemyMesh = new Mesh("../../assets/models/enemy.obj", device);
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
 	playerMesh = new Mesh("../../assets/models/cube.obj", device);
 	
@@ -514,6 +514,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 			enemy = new Entity(enemyMesh, enemyMaterial);
 			enemy->SetPosition(XMFLOAT3(-20, 0, 10));
+			enemy->SetScale(XMFLOAT3(0.02, 0.02, 0.02));
 			enemy->AttachCollider();
 			enemy->GetCollision()->SetPosition(enemy->GetPosition());
 			enemies.push_back(enemy);
@@ -541,6 +542,7 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			enemy = new Entity(enemyMesh, enemyMaterial);
 			enemy->SetPosition(XMFLOAT3(20, 0, 15));
+			enemy->SetScale(XMFLOAT3(0.02, 0.02, 0.02));
 			enemy->AttachCollider();
 			enemy->GetCollision()->SetPosition(enemy->GetPosition());
 			enemies2.push_back(enemy);
