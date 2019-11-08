@@ -267,7 +267,18 @@ void Game::LoadShaders()
 		&enemySpec
 	);
 
-
+	CreateWICTextureFromFile(device,
+		context,
+		L"../../assets/textures/sh3.jpg",
+		0,	// don't need reference to texture
+		&playerDiffuse
+	);
+	CreateWICTextureFromFile(device,
+		context,
+		L"../../assets/textures/sh3_s.jpg",
+		0,	// don't need reference to texture
+		&playerSpec
+	);
 
 	// Create Sampler State
 	D3D11_SAMPLER_DESC sampDesc = {};
@@ -288,7 +299,7 @@ void Game::LoadShaders()
 	rockMaterial = new Material(vertexShaderNormalMap, pixelShaderNormalMap, rockTextureSRV, 0, rockNormalMapSRV, samplerState);
 
 	enemyMaterial = new Material(vertexShaderSpecularMap, pixelShaderSpecularMap, enemyDiffuse1, enemySpec, 0, samplerState);
-	playerMaterial = new Material(vertexShader, pixelShader, fabricTextureSRV, 0, 0, samplerState);
+	playerMaterial = new Material(vertexShaderSpecularMap, pixelShaderSpecularMap, playerDiffuse, playerSpec, 0, samplerState);
 }
 
 
@@ -366,13 +377,15 @@ void Game::CreateBasicGeometry()
 
 	enemyMesh = new Mesh("../../assets/models/enemy.obj", device);
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
-	playerMesh = new Mesh("../../assets/models/cube.obj", device);
+	playerMesh = new Mesh("../../assets/models/player.obj", device);
 	
 	//Change models later
 
 	player = new Entity(playerMesh, playerMaterial);
 	player->AttachCollider();
 	player->SetPosition(XMFLOAT3(0, 0, -1));
+	player->SetRotation(XMFLOAT4(0,-1.55,0,0));
+	player->SetScale(XMFLOAT3(0.3, 0.3, 0.3));
 	player->GetCollision()->SetPosition(player->GetPosition());
 }
 
@@ -443,7 +456,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 		if (GetAsyncKeyState('P') & 0x43) {
 			playerL = new Entity(sphereMesh, fabricMaterial);
-			playerL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+			playerL->SetScale(XMFLOAT3(0.2, 0.2, 0.2));
 			playerL->SetPosition(player->GetPosition());
 			playerL->AttachCollider();
 			playerL->GetCollision()->SetPosition(player->GetPosition());
