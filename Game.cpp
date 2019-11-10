@@ -74,6 +74,8 @@ Game::Game(HINSTANCE hInstance)
 
 	camera = new Camera();
 	camera->CalculateProjectionMatrix(width, height);
+	score = 0;
+	hiScore = 0;
 
 #if defined(DEBUG) || defined(_DEBUG)
 	// Do we want a console window?  Probably only in debug mode
@@ -124,6 +126,9 @@ Game::~Game()
 
 	delete enemyMaterial;
 	delete playerMaterial;
+	
+	score = 0;
+	hiScore = 0;
 
 	giraffeTextureSRV->Release();
 	fabricTextureSRV->Release();
@@ -487,6 +492,11 @@ void Game::Update(float deltaTime, float totalTime)
 					delete enemies[j];
 					enemies.erase(enemies.begin() + j);
 					--j;
+					score+=10;
+					if (score >= hiScore)
+					{
+						hiScore = score;
+					}
 					markContinue = true;
 					continue;
 				}
@@ -507,6 +517,11 @@ void Game::Update(float deltaTime, float totalTime)
 					delete enemies2[j];
 					enemies2.erase(enemies2.begin() + j);
 					j--;
+					score += 20;
+					if (score >= hiScore)
+					{
+						hiScore = score;
+					}
 					markContinue = true;
 					continue;
 				}

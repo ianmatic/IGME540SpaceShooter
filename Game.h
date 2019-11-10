@@ -109,5 +109,7 @@ private:
 	PointLight whitePointLight;
 
 	bool isAlive;
+	int score = 0;
+	int hiScore = 0;
 };
 
