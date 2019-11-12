@@ -274,13 +274,13 @@ void Game::LoadShaders()
 
 	CreateWICTextureFromFile(device,
 		context,
-		L"../../assets/textures/sh3.jpg",
+		L"../../assets/textures/mat.png",
 		0,	// don't need reference to texture
 		&playerDiffuse
 	);
 	CreateWICTextureFromFile(device,
 		context,
-		L"../../assets/textures/sh3_s.jpg",
+		L"../../assets/textures/int.png",
 		0,	// don't need reference to texture
 		&playerSpec
 	);
@@ -382,15 +382,15 @@ void Game::CreateBasicGeometry()
 
 	enemyMesh = new Mesh("../../assets/models/enemy.obj", device);
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
-	playerMesh = new Mesh("../../assets/models/player.obj", device);
+	playerMesh = new Mesh("../../assets/models/f.obj", device);
 	
 	//Change models later
 
 	player = new Entity(playerMesh, playerMaterial);
 	player->AttachCollider();
 	player->SetPosition(XMFLOAT3(0, 0, -1));
-	player->SetRotation(XMFLOAT4(0,-1.55,0,0));
-	player->SetScale(XMFLOAT3(0.3, 0.3, 0.3));
+	//player->SetRotation(XMFLOAT4(0,-1.55,0,0));
+	player->SetScale(XMFLOAT3(0.2, 0.2, 0.2));
 	player->GetCollision()->SetPosition(player->GetPosition());
 }
 
@@ -461,7 +461,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 		if (GetAsyncKeyState('P') & 0x43) {
 			playerL = new Entity(sphereMesh, fabricMaterial);
-			playerL->SetScale(XMFLOAT3(0.2, 0.2, 0.2));
+			playerL->SetScale(XMFLOAT3(0.4, 0.4, 0.4));
 			playerL->SetPosition(player->GetPosition());
 			playerL->AttachCollider();
 			playerL->GetCollision()->SetPosition(player->GetPosition());
