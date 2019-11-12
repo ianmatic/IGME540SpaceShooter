@@ -147,6 +147,8 @@ Game::~Game()
 	playerNormal->Release();
 
 	delete camera;
+	delete spriteBatch;
+	delete spriteFont;
 }
 
 // --------------------------------------------------------
@@ -166,6 +168,9 @@ void Game::Init()
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
 	context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	spriteBatch = new SpriteBatch(context);
+	spriteFont = new SpriteFont(device, L"Fonts/Arial.spritefont");
 
 	// Blue light
 	light.ambientColor = XMFLOAT4(0.0, 0.0, 0.2f, 0);
@@ -736,6 +741,47 @@ void Game::Draw(float deltaTime, float totalTime)
 			//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
 			//     vertices in the currently set VERTEX BUFFER
 			context->DrawIndexed(3, 0, 0);
+
+
+
+
+
+			// Draw some arbitrary text
+			RECT imageRect = { 10, 10, 110, 110 };
+			RECT normalMapRect = { 120, 10, 220, 110 };
+			RECT fontSheetRect = { 230, 10, 320, 110 };
+
+			ID3D11ShaderResourceView* fontSheet;
+			spriteFont->GetSpriteSheet(&fontSheet);
+
+			// We'll use a sprite batch to draw some 2D images
+			spriteBatch->Begin();
+			spriteBatch->Draw(fontSheet, fontSheetRect);
+
+			// Draw some arbitrary text
+			spriteFont->DrawString(
+				spriteBatch,
+				L"WASD - Move\n P - Shoot",
+				XMFLOAT2(10, 600));
+
+			std::wstring dynamicText = L"Score: " + std::to_wstring(score) + L"\nHigh Score:" + std::to_wstring(hiScore);
+			spriteFont->DrawString(
+				spriteBatch,
+				dynamicText.c_str(),
+				XMFLOAT2(10, 40));
+
+			spriteBatch->End();
+
+			fontSheet->Release();
+
+			// Reset any states that may be changed by sprite batch!
+			float blendFactor[4] = { 1,1,1,1 };
+			context->OMSetBlendState(0, blendFactor, 0xFFFFFFFF);
+			context->RSSetState(0);
+			context->OMSetDepthStencilState(0, 0);
+
+
+
 
 		}
 		// Present the back buffer to the user

@@ -10,6 +10,9 @@
 #include "Lights.h"
 #include "WICTextureLoader.h"
 
+#include "SpriteBatch.h"
+#include "SpriteFont.h"
+
 class Game 
 	: public DXCore
 {
@@ -84,6 +87,10 @@ private:
 
 	Material* enemyMaterial;
 	Material* playerMaterial;
+
+	// Sprite batch stuff
+	DirectX::SpriteBatch* spriteBatch;
+	DirectX::SpriteFont* spriteFont;
 
 	ID3D11ShaderResourceView* giraffeTextureSRV;
 	ID3D11ShaderResourceView* fabricTextureSRV;
