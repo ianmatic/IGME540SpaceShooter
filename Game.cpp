@@ -635,8 +635,6 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 		for (int i = 0; i < enemyLasers.size(); i++)
 		{
-			std::cout << "Enemy Laser BB: \nMin: " << enemyLasers[i]->GetCollision()->GetMinCoord().x << " " << enemyLasers[i]->GetCollision()->GetMinCoord().y << " " << enemyLasers[i]->GetCollision()->GetMinCoord().z << "\nMax: " << enemyLasers[i]->GetCollision()->GetMaxCoord().x << " " << enemyLasers[i]->GetCollision()->GetMaxCoord().y << " " << enemyLasers[i]->GetCollision()->GetMaxCoord().z << "\n";
-			std::cout << "Player BB: \nMin: " << player->GetCollision()->GetMinCoord().x << " " << player->GetCollision()->GetMinCoord().y << " " << player->GetCollision()->GetMinCoord().z << "\nMax: " << player->GetCollision()->GetMaxCoord().x << " " << player->GetCollision()->GetMaxCoord().y << " " << player->GetCollision()->GetMaxCoord().z << "\n\n";
 			if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
 			{
 				delete enemyLasers[i];

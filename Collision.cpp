@@ -108,6 +108,15 @@ bool Collision::CheckCollision(Collision* other)
 			return true;
 		}
 	}
+
+	if (this->maxCoord.x < otherMax.x && this->minCoord.x > otherMin.x)
+	{
+		if (this->maxCoord.z < otherMax.z && this->minCoord.z > otherMin.z)
+		{
+			return true;
+		}
+	}
+
 	return false;
 }
 
