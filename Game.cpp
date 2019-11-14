@@ -754,7 +754,6 @@ void Game::Draw(float deltaTime, float totalTime)
 
 			// We'll use a sprite batch to draw some 2D images
 			spriteBatch->Begin();
-			spriteBatch->Draw(fontSheet, fontSheetRect);
 
 			// Draw some arbitrary text
 			spriteFont->DrawString(
