@@ -93,10 +93,15 @@ bool Collision::CheckCollision(Collision* other)
 	DirectX::XMFLOAT3 otherMin = other->GetMinCoord();
 	DirectX::XMFLOAT3 otherMax = other->GetMaxCoord();
 
-	if (otherMin.x > this->minCoord.x && otherMin.x < this->maxCoord.x)
+	return (this->minCoord.x <= other->maxCoord.x && this->maxCoord.x >= other->minCoord.x) && (this->minCoord.z <= other->maxCoord.z && this->maxCoord.z >= other->minCoord.z);
+
+	/*if (otherMin.x > this->minCoord.x && otherMin.x < this->maxCoord.x)
 	{
 		if (otherMin.z > this->minCoord.z && otherMin.z < this->maxCoord.z)
 		{
+			std::cout << "THIS MINX: " << this->minCoord.x << " OTHER MINX: " << otherMin.x << " THIS MAXX: " << this->maxCoord.x << std::endl;
+			std::cout << "THIS MINZ: " << this->minCoord.z << " OTHER MINZ: " << otherMin.z << " THIS MAXZ: " << this->maxCoord.z << std::endl;
+			std::cout << "COLL 1" << std::endl;
 			return true;
 		}
 	}
@@ -105,17 +110,19 @@ bool Collision::CheckCollision(Collision* other)
 	{
 		if (otherMax.z > this->minCoord.z && otherMax.z < this->maxCoord.z)
 		{
+			std::cout << "COLL 2" << std::endl;
 			return true;
 		}
-	}
+	}*/
 
-	if (this->maxCoord.x < otherMax.x && this->minCoord.x > otherMin.x)
-	{
-		if (this->maxCoord.z < otherMax.z && this->minCoord.z > otherMin.z)
-		{
-			return true;
-		}
-	}
+	//if (this->maxCoord.x > otherMin.x && this->minCoord.x < otherMax.x)
+	//{
+	//	if (this->maxCoord.z > otherMin.z && this->minCoord.z < otherMax.z)
+	//	{
+	//		std::cout << "COLL 3" << std::endl;
+	//		return true;
+	//	}
+	//}
 
 	return false;
 }

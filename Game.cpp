@@ -492,7 +492,7 @@ void Game::Update(float deltaTime, float totalTime)
 			bool markContinue = false;
 			for (int j = 0; j < enemies.size(); j++)
 			{
-				if (lasers[i]->GetCollision()->CheckCollision(enemies[j]->GetCollision()) && i < lasers.size() && j < enemies.size())
+				if (enemies[j]->GetCollision()->CheckCollision(lasers[i]->GetCollision()) && i < lasers.size() && j < enemies.size())
 				{
 					delete enemies[j];
 					enemies.erase(enemies.begin() + j);
@@ -517,7 +517,7 @@ void Game::Update(float deltaTime, float totalTime)
 			bool markContinue = false;
 			for (int j = 0; j < enemies2.size(); j++)
 			{
-				if (lasers[i]->GetCollision()->CheckCollision(enemies2[j]->GetCollision()) && i < lasers.size() && j < enemies2.size())
+				if (enemies2[j]->GetCollision()->CheckCollision(lasers[i]->GetCollision()) && i < lasers.size() && j < enemies2.size())
 				{
 					delete enemies2[j];
 					enemies2.erase(enemies2.begin() + j);
@@ -550,6 +550,7 @@ void Game::Update(float deltaTime, float totalTime)
 			enemy->SetScale(XMFLOAT3(0.02, 0.02, 0.02));
 			enemy->AttachCollider();
 			enemy->GetCollision()->SetPosition(enemy->GetPosition());
+			enemy->GetCollision()->SetScale(enemy->GetScale());
 			enemies.push_back(enemy);
 			for (int i = 0; i < enemies.size(); i++)
 			{
@@ -578,6 +579,7 @@ void Game::Update(float deltaTime, float totalTime)
 			enemy->SetScale(XMFLOAT3(0.02, 0.02, 0.02));
 			enemy->AttachCollider();
 			enemy->GetCollision()->SetPosition(enemy->GetPosition());
+			enemy->GetCollision()->SetScale(enemy->GetScale());
 			enemies2.push_back(enemy);
 			for (int i = 0; i < enemies.size(); i++)
 			{
@@ -635,7 +637,7 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 		for (int i = 0; i < enemyLasers.size(); i++)
 		{
-			if (enemyLasers[i]->GetCollision()->CheckCollision(player->GetCollision()) && i < enemyLasers.size())
+			if (player->GetCollision()->CheckCollision(enemyLasers[i]->GetCollision()) && i < enemyLasers.size())
 			{
 				delete enemyLasers[i];
 				delete player;
