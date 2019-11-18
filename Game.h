@@ -8,6 +8,7 @@
 #include "Camera.h"
 #include "Material.h"
 #include "Lights.h"
+#include "Emitter.h"
 #include "WICTextureLoader.h"
 
 #include "SpriteBatch.h"
@@ -56,11 +57,7 @@ private:
 	// determining how far the mouse moved in a single frame.
 	POINT prevMousePos;
 
-	Mesh* redMesh;
-	Mesh* greenMesh;
-	Mesh* blueMesh;
 	Mesh* sphereMesh;
-	Mesh* coneMesh;
 	Mesh* enemyMesh;
 	Mesh* playerMesh;
 
@@ -80,10 +77,7 @@ private:
 
 	Camera* camera;
 
-	Material* giraffeMaterial;
 	Material* fabricMaterial;
-	Material* rustMaterial;
-	Material* rockMaterial;
 
 	Material* enemyMaterial;
 	Material* playerMaterial;
@@ -92,12 +86,7 @@ private:
 	DirectX::SpriteBatch* spriteBatch;
 	DirectX::SpriteFont* spriteFont;
 
-	ID3D11ShaderResourceView* giraffeTextureSRV;
 	ID3D11ShaderResourceView* fabricTextureSRV;
-	ID3D11ShaderResourceView* rustTextureSRV;
-	ID3D11ShaderResourceView* rustSpecularSRV;
-	ID3D11ShaderResourceView* rockTextureSRV;
-	ID3D11ShaderResourceView* rockNormalMapSRV;
 
 	ID3D11ShaderResourceView* enemyDiffuse1;
 	ID3D11ShaderResourceView* enemyDiffuse2;
@@ -105,7 +94,15 @@ private:
 	ID3D11ShaderResourceView* enemyNormal;
 	ID3D11ShaderResourceView* playerDiffuse;
 	ID3D11ShaderResourceView* playerSpec;
-	ID3D11ShaderResourceView* playerNormal;
+
+
+	// Particle stuff
+	ID3D11ShaderResourceView* particleTexture;
+	SimpleVertexShader* particleVS;
+	SimplePixelShader* particlePS;
+	ID3D11DepthStencilState* particleDepthState;
+	ID3D11BlendState* particleBlendState;
+	std::vector<Emitter*> emitters;
 
 
 	ID3D11SamplerState* samplerState;

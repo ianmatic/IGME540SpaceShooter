@@ -32,19 +32,12 @@ Game::Game(HINSTANCE hInstance)
 
 	prevMousePos = { 0,0 };
 
-	redMesh = 0;
-	blueMesh = 0;
-	greenMesh = 0;
 	sphereMesh = 0;
-	coneMesh = 0;
 	enemyMesh = 0;
 	playerMesh = 0;
 	isAlive = true;
 
-	giraffeMaterial = 0;
 	fabricMaterial = 0;
-	rustMaterial = 0;
-	rockMaterial = 0;
 
 	playerMaterial = 0;
 	enemyMaterial = 0;
@@ -55,15 +48,8 @@ Game::Game(HINSTANCE hInstance)
 	enemyNormal = 0;
 	playerDiffuse = 0;
 	playerSpec = 0;
-	playerNormal = 0;
 
 
-
-	giraffeTextureSRV = 0;
-	rustTextureSRV = 0;
-	rustSpecularSRV = 0;
-	rockTextureSRV = 0;
-	rockNormalMapSRV = 0;
 	fabricTextureSRV = 0;
 	samplerState = 0;
 
@@ -111,18 +97,11 @@ Game::~Game()
 		delete entities[i];
 	}
 
-	delete redMesh;
-	delete greenMesh;
-	delete blueMesh;
 	delete sphereMesh;
-	delete coneMesh;
 	delete playerMesh;
 	delete enemyMesh;
 
-	delete giraffeMaterial;
 	delete fabricMaterial;
-	delete rustMaterial;
-	delete rockMaterial;
 
 	delete enemyMaterial;
 	delete playerMaterial;
@@ -130,13 +109,7 @@ Game::~Game()
 	score = 0;
 	hiScore = 0;
 
-	giraffeTextureSRV->Release();
 	fabricTextureSRV->Release();
-	rustTextureSRV->Release();
-	rustSpecularSRV->Release();
-	rockTextureSRV->Release();
-	rockNormalMapSRV->Release();
-	samplerState->Release();
 
 	enemyDiffuse1->Release();
 	enemyDiffuse2->Release();
@@ -144,11 +117,25 @@ Game::~Game()
 	enemyNormal->Release();
 	playerDiffuse->Release();
 	playerSpec->Release();
-	playerNormal->Release();
+
+	samplerState->Release();
 
 	delete camera;
+
+	// spritebatch stuff
 	delete spriteBatch;
 	delete spriteFont;
+
+	// particle stuff
+	particleTexture->Release();
+	particleBlendState->Release();
+	particleDepthState->Release();
+	delete particleVS;
+	delete particlePS;
+
+	for (int i = 0; i < emitters.size(); i++) {
+		delete emitters[i];
+	}
 }
 
 // --------------------------------------------------------
@@ -191,6 +178,28 @@ void Game::Init()
 	whitePointLight.ambientColor = XMFLOAT4(0.1f, 0.1f, 0.1f, 1);
 	whitePointLight.diffuseColor = XMFLOAT4(0.8f, 0.8f, 0.8f, 1);
 	whitePointLight.position = XMFLOAT3(-3, 1, 1);
+
+	// A depth state for the particles
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO; // Turns off depth writing
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	device->CreateDepthStencilState(&dsDesc, &particleDepthState);
+
+
+	// Blend for particles (additive)
+	D3D11_BLEND_DESC blend = {};
+	blend.AlphaToCoverageEnable = false;
+	blend.IndependentBlendEnable = false;
+	blend.RenderTarget[0].BlendEnable = true;
+	blend.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA; // Still respect pixel shader output alpha
+	blend.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&blend, &particleBlendState);
 }
 
 // --------------------------------------------------------
@@ -216,39 +225,19 @@ void Game::LoadShaders()
 	pixelShaderSpecularMap = new SimplePixelShader(device, context);
 	pixelShaderSpecularMap->LoadShaderFile(L"PixelShaderSpecularMap.cso");
 
+	particleVS = new SimpleVertexShader(device, context);
+	particleVS->LoadShaderFile(L"ParticleVS.cso");
+
+	particlePS = new SimplePixelShader(device, context);
+	particlePS->LoadShaderFile(L"ParticlePS.cso");
+
 	// Load the texture
-	CreateWICTextureFromFile(device,
-		context,
-		L"../../assets/textures/giraffe.jpg",
-		0,	// don't need reference to texture
-		&giraffeTextureSRV
-	);
 
 	CreateWICTextureFromFile(device,
 		context,
 		L"../../assets/textures/fabric.jpg",
 		0,	// don't need reference to texture
 		&fabricTextureSRV
-	);
-
-	CreateWICTextureFromFile(device,
-		context,
-		L"../../assets/textures/rust.png",
-		0,	// don't need reference to texture
-		&rustTextureSRV
-	);
-	CreateWICTextureFromFile(device,
-		context,
-		L"../../assets/textures/rustSpecular.png",
-		0,	// don't need reference to texture
-		&rustSpecularSRV
-	);
-
-	CreateWICTextureFromFile(device,
-		context,
-		L"../../assets/textures/rock.jpg",
-		0,	// don't need reference to texture
-		&rockTextureSRV
 	);
 
 
@@ -290,6 +279,9 @@ void Game::LoadShaders()
 		&playerSpec
 	);
 
+	// Particle setup ====================
+	CreateWICTextureFromFile(device, context, L"../../assets/textures/particle.jpg", 0, &particleTexture);
+
 	// Create Sampler State
 	D3D11_SAMPLER_DESC sampDesc = {};
 	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP; // Wrap UVs outside 0-1 range in U direction
@@ -301,12 +293,7 @@ void Game::LoadShaders()
 	sampDesc.MaxLOD = D3D11_FLOAT32_MAX; // Must be larger than 0 
 	device->CreateSamplerState(&sampDesc, &samplerState);
 
-	giraffeMaterial = new Material(vertexShader, pixelShader, giraffeTextureSRV, 0, 0, samplerState);
 	fabricMaterial = new Material(vertexShader, pixelShader, fabricTextureSRV, 0, 0, samplerState);
-	// specular
-	rustMaterial = new Material(vertexShaderSpecularMap, pixelShaderSpecularMap, rustTextureSRV, rustSpecularSRV, 0, samplerState);
-	// normalMap
-	rockMaterial = new Material(vertexShaderNormalMap, pixelShaderNormalMap, rockTextureSRV, 0, rockNormalMapSRV, samplerState);
 
 	enemyMaterial = new Material(vertexShaderSpecularMap, pixelShaderSpecularMap, enemyDiffuse1, enemySpec, 0, samplerState);
 	playerMaterial = new Material(vertexShaderSpecularMap, pixelShaderSpecularMap, playerDiffuse, playerSpec, 0, samplerState);
@@ -349,8 +336,6 @@ void Game::CreateBasicGeometry()
 	// - But just to see how it's done...
 	unsigned int redIndices[] = { 0, 1, 2 };
 
-	redMesh = new Mesh(redVertices, 3, redIndices, device);
-
 
 	Vertex greenVertices[] =
 	{
@@ -367,7 +352,6 @@ void Game::CreateBasicGeometry()
 		0, 2, 3,
 		2, 4, 3 };
 
-	greenMesh = new Mesh(greenVertices, 9, greenIndices, device);
 
 
 	Vertex blueVertices[] =
@@ -379,11 +363,6 @@ void Game::CreateBasicGeometry()
 	};
 
 	unsigned int blueIndices[] = { 0, 1, 2, 0, 2, 3 };
-
-	blueMesh = new Mesh(blueVertices, 6, blueIndices, device);
-
-	//Load in from files
-	coneMesh = new Mesh("../../assets/models/cone.obj", device);
 
 	enemyMesh = new Mesh("../../assets/models/enemy.obj", device);
 	sphereMesh = new Mesh("../../assets/models/sphere.obj", device);
@@ -418,6 +397,20 @@ void Game::OnResize()
 void Game::Update(float deltaTime, float totalTime)
 {
 	entities.clear();
+
+	// Update emitters
+	for (int i = 0; i < emitters.size(); i++) {
+		emitters[i]->Update(deltaTime);
+
+		// remove expired emitters
+		if (emitters[i]->GetTotalTime() < 0.0f) {
+			delete emitters[i];
+			emitters.erase(emitters.begin() + i);
+			--i;
+			continue;
+		}
+	}
+
 	camera->Update(deltaTime);
 	if (isAlive)
 	{
@@ -492,8 +485,33 @@ void Game::Update(float deltaTime, float totalTime)
 			bool markContinue = false;
 			for (int j = 0; j < enemies.size(); j++)
 			{
+				// laser hits enemy
 				if (enemies[j]->GetCollision()->CheckCollision(lasers[i]->GetCollision()) && i < lasers.size() && j < enemies.size())
 				{
+					// create particle effect
+					emitters.push_back(new Emitter(
+						110,							// Max particles
+						20,								// Particles per second
+						1,								// Particle lifetime
+						1.25f,							// Start size
+						0.75f,							// End size
+						XMFLOAT4(1, 0.1f, 0.1f, 0.7f),	// Start color
+						XMFLOAT4(1, 0.6f, 0.1f, 0.0f),		// End color
+						XMFLOAT3(0, 0, 0),				// Start velocity
+						XMFLOAT3(0.2f, 0.2f, 0.2f),		// Velocity randomness range
+						XMFLOAT3(
+							enemies[j]->GetPosition().x, 
+							enemies[j]->GetPosition().y, 
+							enemies[j]->GetPosition().z),				// Emitter position
+						XMFLOAT3(0.1f, 0.1f, 0.1f),		// Position randomness range
+						XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
+						XMFLOAT3(0, 0, 0),				// Constant acceleration
+						device,
+						particleVS,
+						particlePS,
+						particleTexture));
+
+
 					delete enemies[j];
 					enemies.erase(enemies.begin() + j);
 					--j;
@@ -519,6 +537,28 @@ void Game::Update(float deltaTime, float totalTime)
 			{
 				if (enemies2[j]->GetCollision()->CheckCollision(lasers[i]->GetCollision()) && i < lasers.size() && j < enemies2.size())
 				{
+					// create particle effect
+					emitters.push_back(new Emitter(
+						110,							// Max particles
+						20,								// Particles per second
+						1,								// Particle lifetime
+						1.25f,							// Start size
+						0.75f,							// End size
+						XMFLOAT4(1, 0.1f, 0.1f, 0.7f),	// Start color
+						XMFLOAT4(1, 0.6f, 0.1f, 0.0f),		// End color
+						XMFLOAT3(0, 0, 0),				// Start velocity
+						XMFLOAT3(0.2f, 0.2f, 0.2f),		// Velocity randomness range
+						XMFLOAT3(
+							enemies[j]->GetPosition().x,
+							enemies[j]->GetPosition().y,
+							enemies[j]->GetPosition().z),				// Emitter position
+						XMFLOAT3(0.1f, 0.1f, 0.1f),		// Position randomness range
+						XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
+						XMFLOAT3(0, 0, 0),				// Constant acceleration
+						device,
+						particleVS,
+						particlePS,
+						particleTexture));
 					delete enemies2[j];
 					enemies2.erase(enemies2.begin() + j);
 					j--;
@@ -735,54 +775,70 @@ void Game::Draw(float deltaTime, float totalTime)
 			context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 			context->IASetIndexBuffer(entities[i]->GetMesh()->GetIndexBuffer(), DXGI_FORMAT_R32_UINT, 0);
 			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
-			// Finally do the actual drawing
-			//  - Do this ONCE PER OBJECT you intend to draw
-			//  - This will use all of the currently set DirectX "stuff" (shaders, buffers, etc)
-			//  - DrawIndexed() uses the currently set INDEX BUFFER to look up corresponding
-			//     vertices in the currently set VERTEX BUFFER
-			context->DrawIndexed(3, 0, 0);
+		}
 
 
+		//// Particle drawing =============
+		{
 
+			// Particle states
+			float blend[4] = { 1,1,1,1 };
+			context->OMSetBlendState(particleBlendState, blend, 0xffffffff);	// Additive blending
+			context->OMSetDepthStencilState(particleDepthState, 0);				// No depth WRITING
 
+			// No wireframe debug
+			particlePS->SetInt("debugWireframe", 0);
+			particlePS->CopyAllBufferData();
 
-			// Draw some arbitrary text
-			RECT imageRect = { 10, 10, 110, 110 };
-			RECT normalMapRect = { 120, 10, 220, 110 };
-			RECT fontSheetRect = { 230, 10, 320, 110 };
+			// Draw the emitters
+			for (int i = 0; i < emitters.size(); i++) {
+				emitters[i]->Draw(context, camera);
+			}
 
-			ID3D11ShaderResourceView* fontSheet;
-			spriteFont->GetSpriteSheet(&fontSheet);
-
-			// We'll use a sprite batch to draw some 2D images
-			spriteBatch->Begin();
-
-			// Draw some arbitrary text
-			spriteFont->DrawString(
-				spriteBatch,
-				L"WASD - Move\n P - Shoot",
-				XMFLOAT2(10, 600));
-
-			std::wstring dynamicText = L"Score: " + std::to_wstring(score) + L"\nHigh Score:" + std::to_wstring(hiScore);
-			spriteFont->DrawString(
-				spriteBatch,
-				dynamicText.c_str(),
-				XMFLOAT2(10, 40));
-
-			spriteBatch->End();
-
-			fontSheet->Release();
-
-			// Reset any states that may be changed by sprite batch!
-			float blendFactor[4] = { 1,1,1,1 };
-			context->OMSetBlendState(0, blendFactor, 0xFFFFFFFF);
-			context->RSSetState(0);
+			// Reset to default states for next frame
+			context->OMSetBlendState(0, blend, 0xffffffff);
 			context->OMSetDepthStencilState(0, 0);
-
-
-
+			context->RSSetState(0);
 
 		}
+
+
+
+
+
+		// Draw some arbitrary text
+		RECT imageRect = { 10, 10, 110, 110 };
+		RECT normalMapRect = { 120, 10, 220, 110 };
+		RECT fontSheetRect = { 230, 10, 320, 110 };
+
+		ID3D11ShaderResourceView* fontSheet;
+		spriteFont->GetSpriteSheet(&fontSheet);
+
+		// We'll use a sprite batch to draw some 2D images
+		spriteBatch->Begin();
+
+		// Draw some arbitrary text
+		spriteFont->DrawString(
+			spriteBatch,
+			L"WASD - Move\n P - Shoot",
+			XMFLOAT2(10, 600));
+
+		std::wstring dynamicText = L"Score: " + std::to_wstring(score) + L"\nHigh Score:" + std::to_wstring(hiScore);
+		spriteFont->DrawString(
+			spriteBatch,
+			dynamicText.c_str(),
+			XMFLOAT2(10, 40));
+
+		spriteBatch->End();
+
+		fontSheet->Release();
+
+		// Reset any states that may be changed by sprite batch!
+		float blendFactor[4] = { 1,1,1,1 };
+		context->OMSetBlendState(0, blendFactor, 0xFFFFFFFF);
+		context->RSSetState(0);
+		context->OMSetDepthStencilState(0, 0);
+
 		// Present the back buffer to the user
 		//  - Puts the final frame we're drawing into the window so the user can see it
 		//  - Do this exactly ONCE PER FRAME (always at the very end of the frame)
