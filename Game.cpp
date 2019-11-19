@@ -609,6 +609,9 @@ void Game::Update(float deltaTime, float totalTime)
 
 		timer -= 1.0f * deltaTime;
 
+
+		
+
 		if (timer <= 0.0f)
 		{
 
@@ -619,22 +622,30 @@ void Game::Update(float deltaTime, float totalTime)
 			enemy->GetCollision()->SetPosition(enemy->GetPosition());
 			enemy->GetCollision()->SetScale(enemy->GetScale());
 			enemies.push_back(enemy);
+
+			float r3 = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (3.0f - 1.0f)));
+
+			timer = r3;
+		}
+
 			for (int i = 0; i < enemies.size(); i++)
 			{
-				if (enemies[i]->GetPosition().x >= -7.0f || enemies[i]->GetPosition().x <= 7.0f)
+				float shoot1 = 0.1f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (200.0f - 0.1f)));
+
+				if (shoot1 >= 1.0f && shoot1 <= 1.5f)
 				{
-					enemyL = new Entity(sphereMesh, enemyMaterial);
-					enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
-					enemyL->SetPosition(enemies[i]->GetPosition());
-					enemyL->AttachCollider();
-					enemyL->GetCollision()->SetPosition(enemies[i]->GetPosition());
-					enemyL->GetCollision()->SetScale(enemies[i]->GetScale());
-					enemyLasers.push_back(enemyL);
+					if (enemies[i]->GetPosition().x >= -7.0f || enemies[i]->GetPosition().x <= 7.0f)
+					{
+						enemyL = new Entity(sphereMesh, enemyMaterial);
+						enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+						enemyL->SetPosition(enemies[i]->GetPosition());
+						enemyL->AttachCollider();
+						enemyL->GetCollision()->SetPosition(enemies[i]->GetPosition());
+						enemyL->GetCollision()->SetScale(enemies[i]->GetScale());
+						enemyLasers.push_back(enemyL);
+					}
 				}
 			}
-
-			timer = 3.0f;
-		}
 
 
 		timer2 -= 2.0f * deltaTime;
@@ -648,19 +659,32 @@ void Game::Update(float deltaTime, float totalTime)
 			enemy->GetCollision()->SetPosition(enemy->GetPosition());
 			enemy->GetCollision()->SetScale(enemy->GetScale());
 			enemies2.push_back(enemy);
-			for (int i = 0; i < enemies.size(); i++)
-			{
-				enemyL = new Entity(sphereMesh, enemyMaterial);
-				enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
-				enemyL->SetPosition(enemies2[i]->GetPosition());
-				enemyL->AttachCollider();
-				enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
-				enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
-				enemyLasers.push_back(enemyL);
-			}
 
-			timer2 = 4.0f;
+
+			float r3 = 2.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (4.8f - 2.5f)));
+			timer2 = r3;
 		}
+	
+
+		for (int i = 0; i < enemies2.size(); i++)
+		{
+			float shoot2 = 0.1f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (300.0f - 0.1f)));
+
+			if (shoot2 >= 0.1f && shoot2 <= 1.2f)
+			{
+				if (enemies2[i]->GetPosition().x >= -7.0f || enemies2[i]->GetPosition().x <= 7.0f)
+				{
+					enemyL = new Entity(sphereMesh, enemyMaterial);
+					enemyL->SetScale(XMFLOAT3(0.5, 0.5, 0.5));
+					enemyL->SetPosition(enemies2[i]->GetPosition());
+					enemyL->AttachCollider();
+					enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
+					enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
+					enemyLasers.push_back(enemyL);
+				}
+			}
+		}
+
 
 
 		float enemySpeed = 3.0f;
