@@ -706,11 +706,11 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			if (player->GetCollision()->CheckCollision(enemyLasers[i]->GetCollision()) && i < enemyLasers.size())
 			{
-				//delete enemyLasers[i];
-				//delete player;
-				//enemyLasers.erase(enemyLasers.begin() + i);
-				//i = enemyLasers.size();
-				//isAlive = false;
+				delete enemyLasers[i];
+				delete player;
+				enemyLasers.erase(enemyLasers.begin() + i);
+				i = enemyLasers.size();
+				isAlive = false;
 				break;
 			}
 		}
