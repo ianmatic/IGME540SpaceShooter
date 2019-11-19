@@ -10,7 +10,7 @@
 #include "Lights.h"
 #include "Emitter.h"
 #include "WICTextureLoader.h"
-
+#include "DDSTextureLoader.h"
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
 
@@ -35,6 +35,8 @@ public:
 	void OnMouseMove (WPARAM buttonState, int x, int y);
 	void OnMouseWheel(float wheelDelta,   int x, int y);
 private:
+
+	Mesh* cubeMesh;
 
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders(); 
@@ -94,6 +96,13 @@ private:
 	ID3D11ShaderResourceView* enemyNormal;
 	ID3D11ShaderResourceView* playerDiffuse;
 	ID3D11ShaderResourceView* playerSpec;
+
+	// skybox stuff
+	ID3D11ShaderResourceView* skySRV;
+	ID3D11RasterizerState* skyRastState;
+	ID3D11DepthStencilState* skyDepthState;
+	SimpleVertexShader* skyVS;
+	SimplePixelShader* skyPS;
 
 
 	// Particle stuff

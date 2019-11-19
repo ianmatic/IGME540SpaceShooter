@@ -136,6 +136,12 @@ Game::~Game()
 	for (int i = 0; i < emitters.size(); i++) {
 		delete emitters[i];
 	}
+	delete skyVS;
+	delete skyPS;
+	delete cubeMesh;
+	skyDepthState->Release();
+	skyRastState->Release();
+	skySRV->Release();
 }
 
 // --------------------------------------------------------
@@ -200,6 +206,17 @@ void Game::Init()
 	blend.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
 	blend.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	device->CreateBlendState(&blend, &particleBlendState);
+
+	D3D11_RASTERIZER_DESC rd = {};
+	rd.FillMode = D3D11_FILL_SOLID;
+	rd.CullMode = D3D11_CULL_FRONT;
+	device->CreateRasterizerState(&rd, &skyRastState);
+
+	D3D11_DEPTH_STENCIL_DESC ds = {};
+	ds.DepthEnable = true;
+	ds.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	ds.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	device->CreateDepthStencilState(&ds, &skyDepthState);
 }
 
 // --------------------------------------------------------
@@ -230,6 +247,12 @@ void Game::LoadShaders()
 
 	particlePS = new SimplePixelShader(device, context);
 	particlePS->LoadShaderFile(L"ParticlePS.cso");
+
+	skyVS = new SimpleVertexShader(device, context);
+	skyVS->LoadShaderFile(L"VSSky.cso");
+
+	skyPS = new SimplePixelShader(device, context);
+	skyPS->LoadShaderFile(L"PSSky.cso");
 
 	// Load the texture
 
@@ -282,6 +305,9 @@ void Game::LoadShaders()
 	// Particle setup ====================
 	CreateWICTextureFromFile(device, context, L"../../assets/textures/particle.jpg", 0, &particleTexture);
 
+	// Skybox setup
+	CreateDDSTextureFromFile(device, context, L"../../assets/textures/SunnyCubeMap.dds", 0, &skySRV);
+
 	// Create Sampler State
 	D3D11_SAMPLER_DESC sampDesc = {};
 	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP; // Wrap UVs outside 0-1 range in U direction
@@ -318,7 +344,7 @@ void Game::CreateMatrices()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-
+	cubeMesh = new Mesh("../../assets/models/cube.obj", device);
 	// Set up the vertices of the triangle we would like to draw
 	// - We're going to copy this array, exactly as it exists in memory
 	//    over to a DirectX-controlled data structure (the vertex buffer)
@@ -802,8 +828,38 @@ void Game::Draw(float deltaTime, float totalTime)
 
 		}
 
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+		context->RSSetState(skyRastState);
+		context->OMSetDepthStencilState(skyDepthState, 0);
+
+		// Grab the data from the box mesh
+		ID3D11Buffer* skyVB = cubeMesh->GetVertexBuffer();
+		ID3D11Buffer* skyIB = cubeMesh->GetIndexBuffer();
+
+		// Set buffers in the input assembler
+		context->IASetVertexBuffers(0, 1, &skyVB, &stride, &offset);
+		context->IASetIndexBuffer(skyIB, DXGI_FORMAT_R32_UINT, 0);
+
+		// Set up the new sky shaders
+		skyVS->SetMatrix4x4("view", camera->GetViewMatrix());
+		skyVS->SetMatrix4x4("projection", camera->GetProjectionMatrix());
+
+		skyVS->CopyAllBufferData();
+		skyVS->SetShader();
 
 
+		skyPS->SetShader();
+		skyPS->SetShaderResourceView("skyTexture", skySRV);
+		skyPS->SetSamplerState("samplerOptions", samplerState);
+
+		// Finally do the actual drawing
+		context->DrawIndexed(cubeMesh->GetIndexCount(), 0, 0);
+
+		// Reset states for next frame
+		context->RSSetState(0);
+		context->OMSetDepthStencilState(0, 0);
 
 
 		// Draw some arbitrary text
