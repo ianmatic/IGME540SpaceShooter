@@ -402,6 +402,7 @@ void Game::CreateBasicGeometry()
 	//player->SetRotation(XMFLOAT4(0,-1.55,0,0));
 	player->SetScale(XMFLOAT3(0.2, 0.2, 0.2));
 	player->GetCollision()->SetPosition(player->GetPosition());
+	player->GetCollision()->SetScale(player->GetScale());
 }
 
 
