@@ -485,6 +485,8 @@ void Game::Update(float deltaTime, float totalTime)
 		}
 
 		if (GetAsyncKeyState('P') & 0x43) {
+			//SoundStuff
+			//mciSendString(".. / .. / assets / Sounds/playershot.wav", NULL, 0, NULL);
 			playerL = new Entity(sphereMesh, fabricMaterial);
 			playerL->SetScale(XMFLOAT3(0.4, 0.4, 0.4));
 			playerL->SetPosition(player->GetPosition());
@@ -547,6 +549,8 @@ void Game::Update(float deltaTime, float totalTime)
 					{
 						hiScore = score;
 					}
+					//SoundStuff
+					//mciSendString(".. / .. / assets / Sounds/explosion.wav", NULL, 0, NULL);
 					markContinue = true;
 					continue;
 				}
@@ -594,6 +598,8 @@ void Game::Update(float deltaTime, float totalTime)
 					{
 						hiScore = score;
 					}
+					//SoundStuff
+					//mciSendString(".. / .. / assets / Sounds/explosion.wav", NULL, 0, NULL);
 					markContinue = true;
 					continue;
 				}
@@ -642,6 +648,8 @@ void Game::Update(float deltaTime, float totalTime)
 						enemyL->AttachCollider();
 						enemyL->GetCollision()->SetPosition(enemies[i]->GetPosition());
 						enemyL->GetCollision()->SetScale(enemies[i]->GetScale());
+						//SoundStuff
+						//mciSendString(".. / .. / assets / Sounds/enemyshot.wav", NULL, 0, NULL);
 						enemyLasers.push_back(enemyL);
 					}
 				}
@@ -680,6 +688,8 @@ void Game::Update(float deltaTime, float totalTime)
 					enemyL->AttachCollider();
 					enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
 					enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
+					//SoundStuff
+					//mciSendString(".. / .. / assets / Sounds/enemyshot.wav", NULL, 0, NULL);
 					enemyLasers.push_back(enemyL);
 				}
 			}
