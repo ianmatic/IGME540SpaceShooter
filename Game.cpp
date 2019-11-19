@@ -576,9 +576,9 @@ void Game::Update(float deltaTime, float totalTime)
 						XMFLOAT3(0, 0, 0),				// Start velocity
 						XMFLOAT3(0.2f, 0.2f, 0.2f),		// Velocity randomness range
 						XMFLOAT3(
-							enemies[j]->GetPosition().x,
-							enemies[j]->GetPosition().y,
-							enemies[j]->GetPosition().z),				// Emitter position
+							enemies2[j]->GetPosition().x,
+							enemies2[j]->GetPosition().y,
+							enemies2[j]->GetPosition().z),				// Emitter position
 						XMFLOAT3(0.1f, 0.1f, 0.1f),		// Position randomness range
 						XMFLOAT4(-2, 2, -2, 2),			// Random rotation ranges (startMin, startMax, endMin, endMax)
 						XMFLOAT3(0, 0, 0),				// Constant acceleration
