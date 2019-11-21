@@ -1,6 +1,9 @@
 #include "Game.h"
 #include "Vertex.h"
 
+#include <MMSystem.h>
+#define sndPlaySoundW
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -217,6 +220,10 @@ void Game::Init()
 	ds.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	ds.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 	device->CreateDepthStencilState(&ds, &skyDepthState);
+
+
+	//sndPlaySound(".. / .. / assets / Sounds / gameMusic.mp3", SND_ASYNC);
+	//system("PAUSE");
 }
 
 // --------------------------------------------------------
@@ -487,6 +494,8 @@ void Game::Update(float deltaTime, float totalTime)
 		if (GetAsyncKeyState('P') & 0x43) {
 			//SoundStuff
 			//mciSendString(".. / .. / assets / Sounds/playershot.wav", NULL, 0, NULL);
+			//sndPlaySound(".. / .. / assets / Sounds/playershot.wav", SND_ASYNC);
+
 			playerL = new Entity(sphereMesh, fabricMaterial);
 			playerL->SetScale(XMFLOAT3(0.4, 0.4, 0.4));
 			playerL->SetPosition(player->GetPosition());
@@ -551,6 +560,7 @@ void Game::Update(float deltaTime, float totalTime)
 					}
 					//SoundStuff
 					//mciSendString(".. / .. / assets / Sounds/explosion.wav", NULL, 0, NULL);
+					//sndPlaySound(".. / .. / assets / Sounds/explosion.wav", SND_ASYNC);
 					markContinue = true;
 					continue;
 				}
@@ -600,6 +610,7 @@ void Game::Update(float deltaTime, float totalTime)
 					}
 					//SoundStuff
 					//mciSendString(".. / .. / assets / Sounds/explosion.wav", NULL, 0, NULL);
+					//sndPlaySound(".. / .. / assets / Sounds/explosion.wav", SND_ASYNC);
 					markContinue = true;
 					continue;
 				}
@@ -650,6 +661,7 @@ void Game::Update(float deltaTime, float totalTime)
 						enemyL->GetCollision()->SetScale(enemies[i]->GetScale());
 						//SoundStuff
 						//mciSendString(".. / .. / assets / Sounds/enemyshot.wav", NULL, 0, NULL);
+						//sndPlaySound(".. / .. / assets / Sounds/enemyshot.wav", SND_ASYNC);
 						enemyLasers.push_back(enemyL);
 					}
 				}
@@ -690,6 +702,7 @@ void Game::Update(float deltaTime, float totalTime)
 					enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
 					//SoundStuff
 					//mciSendString(".. / .. / assets / Sounds/enemyshot.wav", NULL, 0, NULL);
+					//sndPlaySound(".. / .. / assets / Sounds/enemyshot.wav", SND_ASYNC);
 					enemyLasers.push_back(enemyL);
 				}
 			}
