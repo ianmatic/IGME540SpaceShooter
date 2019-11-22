@@ -2,7 +2,6 @@
 #include "Vertex.h"
 
 #include <MMSystem.h>
-#define sndPlaySoundW
 
 // For the DirectX Math library
 using namespace DirectX;
@@ -495,6 +494,7 @@ void Game::Update(float deltaTime, float totalTime)
 			//SoundStuff
 			//mciSendString(".. / .. / assets / Sounds/playershot.wav", NULL, 0, NULL);
 			//sndPlaySound(".. / .. / assets / Sounds/playershot.wav", SND_ASYNC);
+			PlaySound(TEXT("assets / Sounds/playershot.wav"), NULL, SND_ASYNC);
 
 			playerL = new Entity(sphereMesh, fabricMaterial);
 			playerL->SetScale(XMFLOAT3(0.4, 0.4, 0.4));

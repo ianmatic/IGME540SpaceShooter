@@ -16,7 +16,6 @@
 #include "SpriteFont.h"
 
 #include <MMSystem.h>
-#define sndPlaySoundW
 
 class Game 
 	: public DXCore
