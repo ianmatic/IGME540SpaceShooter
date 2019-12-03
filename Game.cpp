@@ -312,7 +312,7 @@ void Game::LoadShaders()
 	CreateWICTextureFromFile(device, context, L"../../assets/textures/particle.jpg", 0, &particleTexture);
 
 	// Skybox setup
-	CreateDDSTextureFromFile(device, context, L"../../assets/textures/SunnyCubeMap.dds", 0, &skySRV);
+	CreateDDSTextureFromFile(device, context, L"../../assets/textures/skybox.dds", 0, &skySRV);
 
 	// Create Sampler State
 	D3D11_SAMPLER_DESC sampDesc = {};
@@ -856,6 +856,39 @@ void Game::Draw(float deltaTime, float totalTime)
 			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
 		}
 
+		//// Skybox drawing ===============
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+
+		context->RSSetState(skyRastState);
+		context->OMSetDepthStencilState(skyDepthState, 0);
+
+		// Grab the data from the box mesh
+		ID3D11Buffer* skyVB = cubeMesh->GetVertexBuffer();
+		ID3D11Buffer* skyIB = cubeMesh->GetIndexBuffer();
+
+		// Set buffers in the input assembler
+		context->IASetVertexBuffers(0, 1, &skyVB, &stride, &offset);
+		context->IASetIndexBuffer(skyIB, DXGI_FORMAT_R32_UINT, 0);
+
+		// Set up the new sky shaders
+		skyVS->SetMatrix4x4("view", camera->GetViewMatrix());
+		skyVS->SetMatrix4x4("projection", camera->GetProjectionMatrix());
+
+		skyVS->CopyAllBufferData();
+		skyVS->SetShader();
+
+
+		skyPS->SetShader();
+		skyPS->SetShaderResourceView("skyTexture", skySRV);
+		skyPS->SetSamplerState("samplerOptions", samplerState);
+
+		// Finally do the actual drawing
+		context->DrawIndexed(cubeMesh->GetIndexCount(), 0, 0);
+
+		// Reset states for next frame
+		context->RSSetState(0);
+		context->OMSetDepthStencilState(0, 0);
 
 		//// Particle drawing =============
 		{
@@ -916,38 +949,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->OMSetDepthStencilState(0, 0);
 
 
-		//UINT stride = sizeof(Vertex);
-		//UINT offset = 0;
-
-		//context->RSSetState(skyRastState);
-		//context->OMSetDepthStencilState(skyDepthState, 0);
-
-		//// Grab the data from the box mesh
-		//ID3D11Buffer* skyVB = cubeMesh->GetVertexBuffer();
-		//ID3D11Buffer* skyIB = cubeMesh->GetIndexBuffer();
-
-		//// Set buffers in the input assembler
-		//context->IASetVertexBuffers(0, 1, &skyVB, &stride, &offset);
-		//context->IASetIndexBuffer(skyIB, DXGI_FORMAT_R32_UINT, 0);
-
-		//// Set up the new sky shaders
-		//skyVS->SetMatrix4x4("view", camera->GetViewMatrix());
-		//skyVS->SetMatrix4x4("projection", camera->GetProjectionMatrix());
-
-		//skyVS->CopyAllBufferData();
-		//skyVS->SetShader();
-
-
-		//skyPS->SetShader();
-		//skyPS->SetShaderResourceView("skyTexture", skySRV);
-		//skyPS->SetSamplerState("samplerOptions", samplerState);
-
-		//// Finally do the actual drawing
-		//context->DrawIndexed(cubeMesh->GetIndexCount(), 0, 0);
-
-		//// Reset states for next frame
-		//context->RSSetState(0);
-		//context->OMSetDepthStencilState(0, 0);
+		
 
 		// Present the back buffer to the user
 		//  - Puts the final frame we're drawing into the window so the user can see it
