@@ -221,8 +221,8 @@ void Game::Init()
 	device->CreateDepthStencilState(&ds, &skyDepthState);
 
 
-	//sndPlaySound(".. / .. / assets / Sounds / gameMusic.mp3", SND_ASYNC);
-	//system("PAUSE");
+	//SoundStuff
+	//PlaySound(TEXT("../../assets/Sounds/gameMusic.mp3"), NULL, SND_SYNC);
 }
 
 // --------------------------------------------------------
@@ -492,9 +492,7 @@ void Game::Update(float deltaTime, float totalTime)
 
 		if (GetAsyncKeyState('P') & 0x43) {
 			//SoundStuff
-			//mciSendString(".. / .. / assets / Sounds/playershot.wav", NULL, 0, NULL);
-			//sndPlaySound(".. / .. / assets / Sounds/playershot.wav", SND_ASYNC);
-			PlaySound(TEXT("assets / Sounds/playershot.wav"), NULL, SND_ASYNC);
+			PlaySound(TEXT("../../assets/Sounds/playershot.wav"), NULL, SND_ASYNC);
 
 			playerL = new Entity(sphereMesh, fabricMaterial);
 			playerL->SetScale(XMFLOAT3(0.4, 0.4, 0.4));
@@ -554,13 +552,12 @@ void Game::Update(float deltaTime, float totalTime)
 					enemies.erase(enemies.begin() + j);
 					--j;
 					score+=10;
+
+					PlaySound(TEXT("../../assets/Sounds/explosion.wav"), NULL, SND_ASYNC);
 					if (score >= hiScore)
 					{
 						hiScore = score;
 					}
-					//SoundStuff
-					//mciSendString(".. / .. / assets / Sounds/explosion.wav", NULL, 0, NULL);
-					//sndPlaySound(".. / .. / assets / Sounds/explosion.wav", SND_ASYNC);
 					markContinue = true;
 					continue;
 				}
@@ -604,13 +601,11 @@ void Game::Update(float deltaTime, float totalTime)
 					enemies2.erase(enemies2.begin() + j);
 					j--;
 					score += 20;
+					PlaySound(TEXT("../../assets/Sounds/explosion.wav"), NULL, SND_ASYNC);
 					if (score >= hiScore)
 					{
 						hiScore = score;
 					}
-					//SoundStuff
-					//mciSendString(".. / .. / assets / Sounds/explosion.wav", NULL, 0, NULL);
-					//sndPlaySound(".. / .. / assets / Sounds/explosion.wav", SND_ASYNC);
 					markContinue = true;
 					continue;
 				}
@@ -640,6 +635,10 @@ void Game::Update(float deltaTime, float totalTime)
 			enemy->GetCollision()->SetScale(enemy->GetScale());
 			enemies.push_back(enemy);
 
+			//SoundStuff
+			PlaySound(TEXT("../../assets/Sounds/enemyshot.wav"), NULL, SND_ASYNC);
+
+
 			float r3 = 1.0f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (3.0f - 1.0f)));
 
 			timer = r3;
@@ -659,9 +658,6 @@ void Game::Update(float deltaTime, float totalTime)
 						enemyL->AttachCollider();
 						enemyL->GetCollision()->SetPosition(enemies[i]->GetPosition());
 						enemyL->GetCollision()->SetScale(enemies[i]->GetScale());
-						//SoundStuff
-						//mciSendString(".. / .. / assets / Sounds/enemyshot.wav", NULL, 0, NULL);
-						//sndPlaySound(".. / .. / assets / Sounds/enemyshot.wav", SND_ASYNC);
 						enemyLasers.push_back(enemyL);
 					}
 				}
@@ -680,6 +676,8 @@ void Game::Update(float deltaTime, float totalTime)
 			enemy->GetCollision()->SetScale(enemy->GetScale());
 			enemies2.push_back(enemy);
 
+			//SoundStuff
+			PlaySound(TEXT("../../assets/Sounds/enemyshot.wav"), NULL, SND_ASYNC);
 
 			float r3 = 2.5f + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (4.8f - 2.5f)));
 			timer2 = r3;
@@ -700,9 +698,6 @@ void Game::Update(float deltaTime, float totalTime)
 					enemyL->AttachCollider();
 					enemyL->GetCollision()->SetPosition(enemies2[i]->GetPosition());
 					enemyL->GetCollision()->SetScale(enemies2[i]->GetScale());
-					//SoundStuff
-					//mciSendString(".. / .. / assets / Sounds/enemyshot.wav", NULL, 0, NULL);
-					//sndPlaySound(".. / .. / assets / Sounds/enemyshot.wav", SND_ASYNC);
 					enemyLasers.push_back(enemyL);
 				}
 			}
@@ -761,6 +756,16 @@ void Game::Update(float deltaTime, float totalTime)
 				break;
 			}
 		}
+
+
+		timerMusic -= 1.0 * deltaTime;
+		if (timerMusic <= 0.0f)
+		{
+			timerMusic = 483.0f;
+			//SoundStuff
+			//PlaySound(TEXT("../../assets/Sounds/gameMusic.mp3"), NULL, SND_SYNC);
+		}
+
 
 		greenPointLight.position.x += cos(totalTime) * deltaTime;
 

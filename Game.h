@@ -80,6 +80,8 @@ private:
 	float timer = 3.0f;
 	float timer2 = 4.0f;
 
+	float timerMusic = 483.0f;
+
 	Camera* camera;
 
 	Material* fabricMaterial;
