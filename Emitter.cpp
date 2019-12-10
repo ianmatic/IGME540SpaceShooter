@@ -79,6 +79,10 @@ Emitter::Emitter(
 		localParticleVertices[i + 3].UV = DefaultUVs[3];
 	}
 
+	for (int i = 0; i < maxParticles; i++) {
+		particles[i].StartPosition = emitterPosition;
+	}
+
 
 	// Create buffers for drawing particles
 
